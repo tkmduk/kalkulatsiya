@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0D1322">
+<title>TSKO · Ilovalar</title>
+<style>
+:root{--ink:#F7F9FC;--soft:#B9C2D1;--faint:#95A0B3;--line:rgba(255,255,255,.12)}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;min-height:100dvh;padding:28px;display:flex;align-items:center;justify-content:center;
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);
+  background:radial-gradient(circle at 10% 8%,rgba(99,164,255,.20),transparent 34%),
+             radial-gradient(circle at 90% 22%,rgba(167,139,250,.15),transparent 32%),
+             linear-gradient(155deg,#070B14,#0D1322 52%,#070B13);
+}
+.wrap{width:100%;max-width:760px}
+.card{background:#111827;border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.eyebrow{margin-bottom:12px;color:var(--faint);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+h1{margin:0 0 8px;font-size:clamp(30px,5vw,42px);font-weight:700;letter-spacing:-.03em;color:#fff}
+.sub{margin:0 0 24px;color:var(--soft);font-size:14px;line-height:1.6}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.btn{
+  --c:#63A4FF;display:flex;align-items:center;gap:14px;min-height:76px;padding:14px 18px;
+  border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.05);
+  color:#fff;text-decoration:none;font-weight:650;font-size:15px;line-height:1.3;
+  transition:transform .15s,border-color .15s,background .15s;
+}
+.btn:hover,.btn:focus-visible{transform:translateY(-2px);border-color:var(--c);background:rgba(255,255,255,.09);outline:none}
+.btn:focus-visible{box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+.num{
+  flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  font-size:15px;font-weight:700;color:#0B1020;background:var(--c);
+}
+.btn small{display:block;margin-top:2px;font-size:12px;font-weight:500;color:var(--faint)}
+.meta{display:flex;justify-content:space-between;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);color:var(--faint);font-size:12px}
+kbd{padding:1px 6px;border:1px solid var(--line);border-radius:5px;background:rgba(255,255,255,.06);color:var(--soft);font:600 11px ui-monospace,Consolas,monospace}
+@media(max-width:560px){body{padding:14px}.card{padding:21px;border-radius:20px}.buttons{grid-template-columns:1fr}.btn{min-height:64px}.hint-keys{display:none}}
+@media(prefers-reduced-motion:reduce){.btn{transition:none}}
+body{background:linear-gradient(160deg,#0A121C,#101C2C)}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(70px);pointer-events:none}
+body::before{width:60vmax;height:60vmax;left:-18vmax;top:-22vmax;background:radial-gradient(circle,rgba(99,164,255,.36),transparent 68%)}
+body::after{width:52vmax;height:52vmax;right:-16vmax;bottom:-20vmax;background:radial-gradient(circle,rgba(232,203,148,.24),transparent 68%)}
+.card{background:rgba(255,255,255,.065);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 24px 60px rgba(0,0,0,.3)}
+.btn{position:relative;background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.btn[data-last]{border-color:var(--c)}
+.btn .last{position:absolute;top:9px;right:11px;font-size:10.5px;font-weight:700;color:var(--c);border:1px solid var(--c);border-radius:999px;padding:2px 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="eyebrow">TSKO · Ish stoli</div>
+    <h1>Ilovalar</h1>
+    <p class="sub">Kerakli kalkulyatorni tanlang. Har birining o‘z narxlar ro‘yxati va rangi bor.</p>
+
+    <div class="buttons">
+      <a class="btn" style="--c:#63A4FF" href="Calc_1.html"><span class="num">1</span><span>Diagnostika va ta’mirlash<small>Texnik xizmat, ta’mirlash · 92 ta qurilma</small></span></a>
+      <a class="btn" style="--c:#A78BFA" href="Calc_2.html"><span class="num">2</span><span>Telefon va kabel<small>Liniya-montaj ishlari · 46 ta xizmat</small></span></a>
+      <a class="btn" style="--c:#22D3EE" href="Calc_3.html"><span class="num">3</span><span>Montaj va demontaj<small>Video, antenna, xavfsizlik · 80 ta xizmat</small></span></a>
+      <a class="btn" style="--c:#F5B84B" href="Calc_4.html"><span class="num">4</span><span>Kompyuter va IT xizmati<small>Kompyuter, dastur, printer · 94 ta xizmat</small></span></a>
+    </div>
+
+    <div class="meta"><span>Professional xizmat smetasi</span><span class="hint-keys">Tez ochish: <kbd>1</kbd>–<kbd>4</kbd></span></div>
+  </div>
+</div>
+<script>
+(()=>{
+  const links=[...document.querySelectorAll('.btn')];
+  document.addEventListener('keydown',e=>{
+    if(e.ctrlKey||e.metaKey||e.altKey||e.target.matches('input,textarea,select')) return;
+    const n=Number(e.key); if(n>=1&&n<=4) links[n-1].click();
+  });
+})();
+(()=>{try{const a=document.querySelectorAll(".btn")[Number(localStorage.getItem("tsko_last"))-1];if(a){a.dataset.last="1";a.insertAdjacentHTML("beforeend",'<span class="last">Oxirgi</span>')}}catch(e){}})();
+</script>
+</body>
+</html>

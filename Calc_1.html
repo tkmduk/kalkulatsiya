@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TSKO · Ta’mirlash va diagnostika</title>
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2363A4FF'/%3E%3Ctext x='32' y='44' font-size='34' font-weight='700' text-anchor='middle' fill='%230B1020' font-family='Arial'%3E1%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#0D1930">
+<style>
+
+:root{
+  --ink:#F7F9FC;
+  --ink-soft:#B8C2D1;
+  --ink-faint:#7F8A9C;
+  --line:rgba(255,255,255,.10);
+  --line-strong:rgba(255,255,255,.16);
+  --accent:#63A4FF;
+  --accent-2:#7C6DFF;
+  --accent-soft:rgba(99,164,255,.14);
+  --accent-glow:rgba(99,164,255,.26);
+  --money:#55E2B8;
+  --money-soft:rgba(85,226,184,.11);
+  --danger:#FF8D86;
+  --glass:rgba(255,255,255,.055);
+  --glass-strong:rgba(255,255,255,.085);
+  --radius:20px;
+  --shadow:0 24px 70px rgba(0,0,0,.30);
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:24px;scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;min-height:100dvh;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);
+  padding:var(--safe-t) 0 var(--safe-b);
+  background:
+    radial-gradient(circle at 8% 4%, rgba(99,164,255,.26), transparent 34%),
+    radial-gradient(circle at 94% 18%, rgba(85,226,184,.11), transparent 30%),
+    radial-gradient(circle at 55% 100%, rgba(255,255,255,.055), transparent 36%),
+    linear-gradient(155deg,#07111F 0%,#0D1930 48%,#07111C 100%);
+  background-attachment:fixed;overflow-x:hidden;
+}
+h1,h2{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;letter-spacing:-.025em}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace}
+.wrap{max-width:1160px;margin:0 auto;padding:32px 22px 110px;position:relative}
+header{padding:8px 2px 22px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:10px;
+  color:var(--ink-faint);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 5px var(--accent-soft)}
+h1{margin:0 0 8px;font-size:clamp(28px,4vw,40px);font-weight:650;line-height:1.08;color:#fff}
+.sub{color:var(--ink-soft);font-size:14px;max-width:72ch;line-height:1.6;margin:0}
+.print-only{display:none}
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
+  border:1px solid var(--line);border-radius:var(--radius);padding:20px;
+  margin:0;box-shadow:var(--shadow);
+}
+.card h2{margin:0 0 5px;font-size:16px;font-weight:650;color:#fff}
+.card .hint{color:var(--ink-faint);font-size:12.5px;margin:0 0 16px;line-height:1.55}
+.no-print{}
+section.card:first-of-type{margin-bottom:18px}
+#categories{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  appearance:none;border:1px solid var(--line);background:var(--glass-strong);color:var(--ink-soft);
+  border-radius:999px;padding:9px 12px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;
+  display:flex;align-items:center;gap:7px;transition:transform .16s ease,border-color .16s ease,background .16s ease,color .16s ease;
+}
+.chip .n{font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;font-size:10.5px;color:var(--ink-faint);background:rgba(0,0,0,.22);border-radius:999px;padding:2px 6px}
+.chip[aria-pressed="true"]{
+  background:linear-gradient(135deg,var(--accent-soft),rgba(255,255,255,.06));
+  border-color:var(--accent);color:#fff;box-shadow:0 8px 24px var(--accent-glow)
+}
+.chip[aria-pressed="true"] .n{color:#fff;background:rgba(0,0,0,.22)}
+@media(hover:hover){.chip:hover{transform:translateY(-1px);border-color:var(--accent);color:#fff}}
+.chiprow-actions{display:flex;justify-content:flex-end;margin-top:10px}
+.linklike{
+  background:none;border:0;color:var(--ink-faint);font:inherit;font-size:12px;font-weight:600;cursor:pointer;
+  padding:4px 0;text-decoration:underline;text-underline-offset:3px
+}
+.linklike:disabled{opacity:.35;cursor:default;text-decoration:none}
+.main-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,.85fr);gap:18px;align-items:start}
+.main-grid > .card:first-child{min-width:0}
+.main-grid > #cartCard{position:sticky;top:18px;min-width:0}
+.search-wrap{position:relative;margin-bottom:8px}
+.search-wrap::before{
+  content:"⌕";position:absolute;left:14px;top:50%;transform:translateY(-52%);
+  color:var(--ink-faint);font-size:20px;line-height:1;pointer-events:none;z-index:2
+}
+.search{
+  width:100%;height:48px;padding:0 86px 0 40px;border:1px solid var(--line);border-radius:13px;
+  font-size:14px;font-family:inherit;background:rgba(0,0,0,.16);color:var(--ink);
+  transition:border-color .16s,box-shadow .16s,background .16s
+}
+.search::placeholder{color:#697487}
+.search:focus{background:rgba(0,0,0,.22);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.search-clear{position:absolute;right:9px;top:7px;height:34px;min-width:34px;padding:0 9px;border:1px solid transparent;border-radius:9px;background:rgba(255,255,255,.055);color:var(--ink-soft);font:600 12px system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;cursor:pointer;opacity:.85;transition:.15s}
+.search-clear:hover{background:var(--accent-soft);border-color:var(--accent);color:#fff}
+.search-clear:disabled{display:none}
+.search-meta{display:flex;justify-content:space-between;gap:10px;align-items:center;min-height:22px;color:var(--ink-faint);font-size:11px;margin:0 2px 2px}
+.search-meta .hint-key{font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;border:1px solid var(--line);background:rgba(255,255,255,.035);padding:2px 6px;border-radius:6px;color:#AAB4C3}
+input:focus,button:focus-visible,.chip:focus-visible{outline:0}
+.list-head{
+  display:grid;grid-template-columns:56px 1fr 126px 148px 128px;gap:12px;
+  padding:8px 8px 7px;color:#95A0B3;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em
+}
+.list-head span:nth-child(n+3){text-align:right}
+.list{margin-top:0;border-top:1px solid var(--line)}
+.count-line{color:var(--ink-faint);font-size:11.5px;margin:9px 2px 0}
+.row{
+  display:grid;grid-template-columns:56px minmax(0,1fr) 126px 148px 128px;
+  grid-template-areas:"code name price qty sum";align-items:center;gap:12px;
+  padding:12px 8px;border-bottom:1px solid rgba(255,255,255,.075);border-radius:12px;transition:background .16s,transform .16s
+}
+.row .code{grid-area:code;font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;font-size:11.5px;color:#95A0B3}
+.row .name{grid-area:name;font-size:13.5px;line-height:1.4;color:#EDF1F7}
+.row .unitprice{grid-area:price;font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;font-size:12px;color:var(--ink-soft);text-align:right;white-space:nowrap}
+.row .sum{grid-area:sum;font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;font-size:13px;font-weight:650;text-align:right;white-space:nowrap}
+.row.has-qty{
+  background:linear-gradient(90deg,var(--money-soft),var(--accent-soft),transparent);
+  box-shadow:inset 3px 0 0 var(--money)
+}
+@media(hover:hover){.row:hover{background:rgba(255,255,255,.045);transform:translateX(2px)}}
+.stepper{
+  grid-area:qty;display:flex;align-items:stretch;height:36px;border:1px solid var(--line);
+  border-radius:10px;overflow:hidden;background:rgba(0,0,0,.18)
+}
+.stepper button{
+  border:0;background:transparent;color:var(--ink-soft);width:36px;font-size:17px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;transition:background .14s,color .14s
+}
+.stepper button:hover{background:var(--accent-soft);color:#fff}
+.stepper button:active{background:var(--accent);color:#fff}
+.stepper button:disabled{opacity:.25;cursor:default;background:transparent}
+.stepper input{
+  width:100%;min-width:0;border:0;text-align:center;font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;font-size:13px;
+  font-weight:600;background:transparent;color:#fff;padding:0 2px
+}
+.empty{
+  padding:52px 16px;text-align:center;color:var(--ink-faint);font-size:13px;line-height:1.7;
+  border:1px dashed var(--line);border-radius:13px;margin-top:10px
+}
+.empty::before{content:"⌕";display:block;font-size:28px;color:var(--accent);margin-bottom:5px}
+.cart-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.075)}
+.cart-item:last-child{border-bottom:0}
+.cart-item .ci-name{flex:1;min-width:0;font-size:13px;line-height:1.4;color:#EDF1F7}
+.cart-item .ci-name .ci-code{display:block;font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;font-size:10px;color:var(--ink-faint);margin-top:2px}
+.cart-item .ci-qty{font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;font-size:11.5px;color:var(--ink-soft);white-space:nowrap}
+.cart-item .ci-sum{font-family:ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;font-weight:650;font-size:12.5px;white-space:nowrap;min-width:88px;text-align:right}
+.ci-remove{
+  border:0;background:rgba(255,255,255,.045);color:#A7B0BE;cursor:pointer;font-size:14px;line-height:1;
+  width:28px;height:28px;border-radius:8px;font-family:inherit;transition:.15s
+}
+.ci-remove:hover{background:rgba(255,141,134,.12);color:var(--danger)}
+.total-line{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;padding-top:15px;border-top:1px solid var(--line)
+}
+.total-line .label{font-size:12px;color:var(--ink-faint);font-weight:600}
+.total-line .value{
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:25px;font-weight:700;
+  background:linear-gradient(90deg,var(--money),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;
+  text-align:right;white-space:nowrap
+}
+.note{font-size:11.5px;color:var(--ink-faint);margin-top:9px;line-height:1.5}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+button.btn{
+  border:0;border-radius:11px;padding:10px 13px;min-height:40px;font-weight:650;font-size:13px;cursor:pointer;font-family:inherit;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;
+  box-shadow:0 9px 24px var(--accent-glow);transition:transform .16s,filter .16s,box-shadow .16s
+}
+button.btn.secondary{background:var(--accent-soft);color:var(--accent);box-shadow:none}
+button.btn.ghost{background:rgba(255,255,255,.045);color:var(--ink-soft);border:1px solid var(--line);box-shadow:none}
+button.btn:disabled{opacity:.34;cursor:default;transform:none;box-shadow:none}
+button.btn.btn-armed{background:linear-gradient(135deg,#E4776A,#FF8D86);box-shadow:0 8px 22px rgba(228,119,106,.22)}
+@media(hover:hover){button.btn:not(:disabled):hover{transform:translateY(-1px);filter:brightness(1.06)}}
+.sticky{
+  position:sticky;bottom:calc(12px + var(--safe-b));z-index:25;
+  max-width:1160px;margin:18px auto 0;background:rgba(9,14,24,.97);color:#fff;border-radius:16px;
+  padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  box-shadow:0 20px 50px rgba(0,0,0,.40);border:1px solid var(--line-strong);
+}
+.sticky .s-label{font-size:10px;opacity:.62;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.sticky .s-value{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:19px;font-weight:700}
+.sticky .s-actions{display:flex;gap:7px}
+.sticky button{
+  border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:12px;font-weight:650;cursor:pointer;
+  font-family:inherit;background:rgba(255,255,255,.08);color:#fff;transition:.15s
+}
+.sticky button:hover{background:var(--accent-soft);border-color:var(--accent)}
+.toast{
+  position:fixed;left:50%;bottom:calc(88px + var(--safe-b));transform:translateX(-50%) translateY(10px);
+  background:rgba(9,14,24,.98);color:#fff;padding:10px 15px;border-radius:11px;font-size:12.5px;opacity:0;
+  pointer-events:none;transition:opacity .18s,transform .18s;box-shadow:0 12px 30px rgba(0,0,0,.3);
+  border:1px solid var(--line-strong);z-index:50;white-space:nowrap
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:900px){
+  .main-grid{grid-template-columns:1fr}
+  .main-grid > #cartCard{position:relative;top:auto}
+}
+@media(max-width:700px){
+  .wrap{padding:22px 12px 98px}
+  header{padding:4px 2px 18px}
+  h1{font-size:27px}
+  .card{padding:16px;border-radius:17px}
+  .main-grid{gap:12px}
+  .list-head{display:none}
+  .row{grid-template-columns:1fr auto;grid-template-areas:"name name" "code price" "qty sum";row-gap:8px;padding:13px 5px}
+  .row .unitprice{text-align:right}
+  .row .code{align-self:start}
+  .stepper{width:132px}
+  .row .sum{align-self:center}
+  .sticky{left:8px;right:8px;width:auto;margin:14px 8px 0;padding:10px 11px}
+  .sticky .s-value{font-size:17px}
+  .sticky button{padding:8px 9px}
+  .total-line .value{font-size:21px}
+}
+@media(max-width:430px){
+  .btnrow{display:grid;grid-template-columns:1fr 1fr}
+  button.btn:last-child{grid-column:1/-1}
+  .cart-item{gap:7px}
+  .cart-item .ci-sum{min-width:76px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media print{
+  body{background:#fff;color:#000;padding:0}
+  
+  .no-print{display:none!important}
+  .print-only{display:block}
+  .wrap{max-width:100%;padding:0}
+  .card{box-shadow:none;border:0;padding:0;margin:0 0 14px;background:#fff;}
+  .main-grid{display:block}
+  .main-grid > #cartCard{position:static}
+  .card h2,.cart-item,.cart-item .ci-name{color:#000}
+  .cart-item .ci-code,.cart-item .ci-qty{color:#555}
+  .total-line .value{-webkit-text-fill-color:#000;background:none;color:#000}
+}
+
+
+/* ===== RAPID WORKBENCH ===== */
+.quickbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;padding:10px;border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:16px}
+.quickbar .q-label{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;margin:0 4px 0 2px}
+.qbtn{border:1px solid var(--line);background:rgba(255,255,255,.045);color:var(--ink-soft);border-radius:10px;padding:8px 11px;font:600 12px system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;cursor:pointer;transition:.18s ease;white-space:nowrap}
+.qbtn:hover,.qbtn:focus-visible{border-color:var(--accent);color:var(--ink);background:var(--accent-soft);transform:translateY(-1px);outline:none}
+.qbtn.primary{background:var(--accent-soft);border-color:rgba(99,164,255,.32);color:var(--ink)}
+.qbtn.danger:hover{border-color:var(--danger);background:rgba(255,141,134,.08)}
+.quick-status{margin-left:auto;font-size:11px;color:var(--ink-faint);white-space:nowrap}
+.quick-status strong{color:var(--ink-soft)}
+.bulk-row{display:none;gap:8px;align-items:center;margin:10px 0 0;padding:9px;border:1px dashed var(--line-strong);border-radius:12px;background:rgba(255,255,255,.025)}
+.bulk-row.show{display:flex}.bulk-row span{font-size:12px;color:var(--ink-soft)}
+.bulk-input{width:76px;border:1px solid var(--line);background:rgba(0,0,0,.18);color:var(--ink);border-radius:9px;padding:7px 9px;font:600 13px ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;outline:none}
+.bulk-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.modal-backdrop{position:fixed;inset:0;z-index:50;background:rgba(2,7,15,.85);display:none;align-items:center;justify-content:center;padding:18px}
+.modal-backdrop.show{display:flex}.modal{width:min(560px,100%);border:1px solid var(--line-strong);background:linear-gradient(145deg,rgba(20,31,50,.96),rgba(9,16,28,.97));box-shadow:0 30px 100px rgba(0,0,0,.5);border-radius:22px;padding:20px}
+.modal h3{margin:0 0 5px;font:700 20px system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}.modal p{margin:0 0 15px;color:var(--ink-faint);font-size:13px;line-height:1.5}
+.modal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.modal-action{padding:12px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.04);color:var(--ink);text-align:left;cursor:pointer;font:600 13px system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}.modal-action:hover{border-color:var(--accent);background:var(--accent-soft)}
+.modal-bottom{display:flex;justify-content:flex-end;margin-top:14px}.modal-close{border:0;background:transparent;color:var(--ink-faint);cursor:pointer;padding:8px 10px}.modal-close:hover{color:var(--ink)}
+.job-name{width:100%;margin:0 0 12px;border:1px solid var(--line);background:rgba(255,255,255,.035);color:var(--ink);border-radius:11px;padding:10px 12px;font:500 13px system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;outline:none}.job-name:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.kbd{display:inline-flex;align-items:center;padding:2px 6px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;background:rgba(0,0,0,.16);font:600 10px ui-monospace,SFMono-Regular,Consolas,'Courier New',monospace;color:var(--ink-soft)}
+@media(max-width:700px){.quick-status{width:100%;margin-left:0}.quickbar{gap:6px}.qbtn{flex:1}.modal-grid{grid-template-columns:1fr}.bulk-row{flex-wrap:wrap}}
+@media print{.quickbar,.modal-backdrop{display:none!important}}
+
+.rowcat{display:block;margin-top:2px;font-size:11.5px;color:#95A0B3}
+.chip.seg{display:flex;flex-direction:column;align-items:flex-start;flex:1 1 210px;gap:4px;text-align:left;border-radius:16px;padding:14px 16px}
+.chip.seg strong{font-size:15px}.chip.seg small{font-size:12px;font-weight:400;color:var(--ink-faint);line-height:1.4}
+.chip.seg[aria-pressed="true"] small{color:var(--ink-soft)}
+
+/* ===== PROFESSIONAL FINISH ===== */
+.wrap{max-width:1320px}
+@media(min-width:901px){.main-grid{grid-template-columns:minmax(0,1fr) 410px}}
+.sub{font-size:15px;line-height:1.55;max-width:900px}.eyebrow{font-size:12px}
+.card h2{font-size:19px}.card .hint{font-size:14px}
+.search{font-size:16px}.search-meta{font-size:12.5px}.count-line{font-size:13px}.note{font-size:12.5px}
+.chip{font-size:14.5px;padding:10px 14px}.chip .n{font-size:12px}
+.chip.seg strong{font-size:17px}.chip.seg small{font-size:13px}
+.list-head{font-size:12px;color:#C4CCD9}
+.row .code{font-size:16px;font-weight:700;color:var(--accent)}
+.row .name{font-size:16px;line-height:1.4}.rowcat{font-size:12.5px}
+.row .unitprice{font-size:14.5px}.row .sum{font-size:16px}
+.stepper{height:44px}.stepper button{width:42px;font-size:19px}.stepper input{font-size:17px}
+.cart-item .ci-name{font-size:15px}.cart-item .ci-name .ci-code{font-size:12.5px;color:var(--ink-soft)}
+.cart-item .ci-qty{font-size:14.5px}.cart-item .ci-sum{font-size:15.5px}.ci-remove{width:32px;height:32px}
+.total-line .label{font-size:14.5px}.total-line .value{font-size:29px}
+button.btn{font-size:15px;min-height:46px}
+.sticky .s-label{font-size:11.5px}.sticky .s-value{font-size:21px}.sticky button{font-size:14px;padding:10px 13px}
+.toast{font-size:14px}
+.qbtn{font-weight:600;font-size:14px;font-family:inherit;padding:9px 14px}.quickbar .q-label{font-size:12px}.quick-status{font-size:12.5px}.bulk-row span{font-size:13.5px}
+.bulk-input{font-size:15px}
+button:focus-visible,.chip:focus-visible,.qbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(min-width:701px){.list-head,.row{grid-template-columns:84px minmax(0,1fr) 128px 150px 132px}}
+@media(max-width:700px){.search-meta span:last-child,.quick-status{display:none}.sticky .s-value{font-size:19px;white-space:nowrap}.sticky button{white-space:nowrap}.row .name{font-size:16px}.row .code{font-size:15px}}
+/* glass workbench */
+.quickbar{background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border-color:rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.modal-backdrop{background:rgba(3,8,18,.5);-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}
+.modal{width:min(660px,100%);max-height:min(90dvh,800px);overflow:auto;display:flex;flex-direction:column;gap:16px;padding:22px;border-radius:26px;
+  background:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.24);
+  box-shadow:0 30px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.3);
+  -webkit-backdrop-filter:blur(32px) saturate(170%);backdrop-filter:blur(32px) saturate(170%);animation:mIn .2s ease}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.modal{background:rgba(20,28,44,.98)}}
+@keyframes mIn{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.m-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.m-head h3{margin:0 0 4px;font:700 23px system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:#fff}
+.m-head p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.5}
+.m-x{flex:none;width:38px;height:38px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:16px;cursor:pointer}
+.m-x:hover{background:rgba(255,255,255,.16)}
+.m-sec h4{margin:0 0 9px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.m-save{display:flex;gap:8px}.m-save .job-name{margin:0;flex:1;font-size:16px;padding:12px 14px;background:rgba(0,0,0,.25);border-color:rgba(255,255,255,.18)}
+.m-hint{min-height:18px;margin-top:6px;font-size:13px;color:var(--ink-soft)}
+.jobs{display:grid;gap:8px;max-height:230px;overflow:auto}
+.job{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+.job .j-main{flex:1;min-width:0}.job .j-name{font-size:15.5px;font-weight:650;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.job .j-meta{margin-top:2px;font-size:12.5px;color:var(--ink-soft)}
+.job .qbtn{padding:8px 12px;font-size:13.5px}.job .qbtn.armed{border-color:var(--danger);background:rgba(255,141,134,.16);color:#fff}
+.jobs-empty{padding:16px;text-align:center;font-size:14px;color:var(--ink-soft);border:1px dashed rgba(255,255,255,.2);border-radius:14px}
+.m-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.m-tool{padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;text-align:left;cursor:pointer;font-weight:650;font-size:14px;line-height:1.3;font-family:inherit}
+.m-tool small{display:block;margin-top:3px;font-weight:400;font-size:12px;color:var(--ink-soft)}
+.m-tool:hover{background:rgba(255,255,255,.12);border-color:var(--accent)}
+.m-foot{font-size:12.5px;color:var(--ink-soft)}
+@media(max-width:700px){.m-tools{grid-template-columns:1fr}.m-save{flex-direction:column}.modal{padding:18px;border-radius:22px}}
+/* print sheet */
+#printSheet{display:none}
+@page{size:A4;margin:14mm 12mm}
+@media print{
+  html,body{background:#fff!important;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font:11pt/1.4 system-ui,'Segoe UI',Arial,sans-serif;padding:0}
+  .wrap,.sticky,.toast,.modal-backdrop,.quickbar{display:none!important}
+  #printSheet{display:block!important}
+  .ps-head{display:flex;justify-content:space-between;gap:16px;border-bottom:2.5px solid #111;padding-bottom:9px;margin-bottom:12px}
+  .ps-org{font-size:9pt;letter-spacing:.08em;text-transform:uppercase;color:#444;font-weight:700}
+  #printSheet h1{font-size:19pt;margin:3px 0 4px;color:#000;letter-spacing:0}
+  .ps-head p{margin:0;font-size:9.5pt;color:#333;max-width:125mm}
+  .ps-meta{text-align:right;font-size:8.5pt;color:#555;white-space:nowrap}.ps-meta strong{display:block;color:#000;font-size:10.5pt;margin-bottom:5px}
+  #printSheet table{width:100%;border-collapse:collapse;font-size:10pt}
+  #printSheet th{background:#e9ebef!important;text-align:left;border:1px solid #8d939e;padding:5px 6px;font-size:9pt}
+  #printSheet td{border:1px solid #b5bac3;padding:5px 6px;vertical-align:top}
+  #printSheet thead{display:table-header-group}#printSheet tfoot{display:table-row-group}#printSheet tr{break-inside:avoid}
+  #printSheet .c{text-align:center}#printSheet .r{text-align:right;white-space:nowrap}#printSheet .b{font-weight:700}
+  #printSheet .k{font-weight:700;white-space:nowrap}
+  #printSheet tfoot td{border-top:2.5px solid #111;font-size:12pt;font-weight:700;background:#f2f3f5!important}
+  .ps-note{font-size:8.5pt;color:#444;margin:10px 0 0}
+  .ps-sign{display:flex;gap:28mm;margin-top:16mm;break-inside:avoid}.ps-sign div{flex:1}.ps-sign span{font-size:9pt;color:#444}.ps-sign i{display:block;border-bottom:1px solid #000;height:10mm}
+}
+@media screen{:root{--accent:#8DB8F5;--accent-2:#9DA8F7;--accent-soft:rgba(141,184,245,.15);--accent-glow:rgba(141,184,245,.22);--money:#8FDCC6;--bg1:#0A101C;--bg2:#111C30;--oa:96,150,235;--ob:140,120,240}}
+
+@media screen{
+:root{--ink-faint:#93A0B2;--line:rgba(255,255,255,.11);--line-strong:rgba(255,255,255,.2);--radius:22px;
+--glass:rgba(255,255,255,.06);--glass-strong:rgba(255,255,255,.10);--shadow:0 18px 50px rgba(0,0,0,.28);
+--g-bg:rgba(255,255,255,.065);--g-edge:inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(255,255,255,.03)}
+body{background:linear-gradient(160deg,var(--bg1),var(--bg2));background-attachment:fixed;font-feature-settings:"tnum" 1}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(70px);pointer-events:none;will-change:transform}
+body::before{width:60vmax;height:60vmax;left:-18vmax;top:-22vmax;background:radial-gradient(circle,rgba(var(--oa),.42),transparent 68%);animation:drift 38s ease-in-out infinite alternate}
+body::after{width:52vmax;height:52vmax;right:-16vmax;bottom:-20vmax;background:radial-gradient(circle,rgba(var(--ob),.30),transparent 68%);animation:drift 46s ease-in-out infinite alternate-reverse}
+@keyframes drift{to{transform:translate3d(6vmax,4vmax,0) scale(1.08)}}
+.wrap{z-index:1}
+.card,.quickbar,.sticky,.modal,.bulk-row{background:var(--g-bg);border:1px solid var(--line);box-shadow:var(--g-edge),var(--shadow);
+-webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%)}
+.card{border-radius:var(--radius);padding:22px}
+.quickbar{border-radius:16px}
+.sticky{background:rgba(255,255,255,.09);border-radius:18px}
+.modal-backdrop{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);background:rgba(6,10,14,.5)}
+.modal{background:rgba(24,32,40,.72);-webkit-backdrop-filter:blur(30px) saturate(150%);backdrop-filter:blur(30px) saturate(150%)}
+.eyebrow{color:var(--accent)}
+.eyebrow::before{background:var(--accent);box-shadow:0 0 0 5px var(--accent-soft)}
+h1{font-weight:600;letter-spacing:-.03em;text-wrap:balance}
+.card h2{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.chip{background:var(--glass);border-radius:999px;padding:9px 14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.chip .n{background:rgba(255,255,255,.09)}
+.chip[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);box-shadow:0 6px 22px var(--accent-glow),var(--g-edge)}
+.search{background:rgba(255,255,255,.06);border-radius:14px;box-shadow:inset 0 1px 2px rgba(0,0,0,.18)}
+.search:focus{background:rgba(255,255,255,.09)}
+.list,.row{border-color:rgba(255,255,255,.07)}
+.row{border-radius:14px}
+.row.has-qty{background:linear-gradient(90deg,var(--accent-soft),rgba(255,255,255,.03) 70%,transparent);box-shadow:inset 3px 0 0 var(--accent)}
+.row.has-qty .sum{color:var(--money)}
+.stepper{background:rgba(255,255,255,.06);border-radius:12px;box-shadow:inset 0 1px 2px rgba(0,0,0,.18)}
+.stepper:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.stepper input:focus{background:var(--accent-soft);outline:0}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.stepper input{-moz-appearance:textfield;appearance:textfield}
+button.btn,.qbtn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#0E141B;box-shadow:0 8px 22px var(--accent-glow),inset 0 1px 0 rgba(255,255,255,.4)}
+button.btn.secondary{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);box-shadow:none}
+button.btn.ghost,.qbtn,.tk-tool{background:var(--glass);color:var(--ink-soft);border:1px solid var(--line);box-shadow:var(--g-edge)}
+button.btn.btn-armed{background:linear-gradient(135deg,#E58A80,#F0A69E);color:#2A0D09}
+.qbtn.primary{border:0}
+.total-line .value{background:none;-webkit-text-fill-color:var(--money);color:var(--money);text-shadow:0 0 28px rgba(var(--ob),.35)}
+.sticky .s-value{color:var(--money)}
+.sticky button{border-radius:11px}
+.toast{background:rgba(24,32,40,.8);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.cart-item,.job,.m-tool{border-color:rgba(255,255,255,.08)}
+.m-tool,.job,.job-name,.bulk-input{background:var(--glass);border-radius:12px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@supports not (backdrop-filter:blur(1px)){.card,.quickbar,.sticky,.bulk-row{background:rgba(24,32,42,.92)}}
+/* comfort */
+.tk-back{display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--glass);color:var(--ink-soft);font-size:12.5px;font-weight:600;text-decoration:none;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.tk-back:hover{border-color:var(--accent);color:#fff}
+.tk-tools{display:flex;gap:8px;margin:4px 0 10px}
+.tk-tool{border-radius:999px;min-height:34px;padding:0 14px;font:600 12px inherit;font-family:inherit;cursor:pointer}
+.tk-tool[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:#fff}
+.tk-tool b{margin-left:6px;color:var(--money)}
+.only-sel .row:not(.has-qty){display:none}
+.only-sel:not(:has(.has-qty))::after{content:"Hali xizmat tanlanmagan.";display:block;padding:34px 16px;text-align:center;color:var(--ink-faint);font-size:13px}
+@media(min-width:901px){#cartList{max-height:calc(100dvh - 340px);overflow:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}.main-grid>#cartCard{top:16px}}
+@media(max-width:700px){
+.card{padding:16px;border-radius:20px}
+.quickbar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.quickbar::-webkit-scrollbar{display:none}
+.quickbar .quick-status,.search-meta>span:last-child{display:none}
+.qbtn,.tk-tool{min-height:42px}
+#categories{flex-wrap:nowrap;overflow-x:auto;margin:0 -4px;padding:2px 4px 8px;scroll-snap-type:x proximity;scrollbar-width:none}
+#categories::-webkit-scrollbar{display:none}#categories .chip{flex:none;min-height:42px;scroll-snap-align:start}
+.stepper{height:46px;width:150px}.stepper button{width:48px;font-size:21px}
+.stepper input,.search,.job-name,.bulk-input{font-size:16px}.search{height:52px}
+.ci-remove{width:38px;height:38px}
+.sticky{bottom:calc(8px + var(--safe-b))}.sticky button{min-height:42px}
+.toast{bottom:calc(92px + var(--safe-b));white-space:normal;max-width:calc(100vw - 32px);text-align:center}}
+}
+@media print{.tk-back,.tk-tools,#tkTg,#tkShare{display:none!important}}
+
+@media screen{:root{--ac:141,184,245}}
+
+@media screen{
+button.btn,.qbtn.primary{background:linear-gradient(135deg,rgba(var(--ac),.30),rgba(var(--ac),.13));color:#fff;border:1px solid rgba(var(--ac),.5);box-shadow:var(--g-edge)}
+button.btn.secondary{background:rgba(var(--ac),.12);color:var(--ink);border:1px solid rgba(var(--ac),.35)}
+button.btn.btn-armed{background:linear-gradient(135deg,rgba(229,138,128,.45),rgba(229,138,128,.2));color:#fff;border:1px solid rgba(229,138,128,.6)}
+@media(hover:hover){button.btn:not(:disabled):hover,.qbtn:hover{filter:none;background:rgba(var(--ac),.26);border-color:rgba(var(--ac),.7)}}
+.tk-mic{position:absolute;right:52px;top:7px;width:34px;height:34px;border:0;border-radius:9px;background:rgba(255,255,255,.06);color:var(--ink-soft);font-size:15px;cursor:pointer;z-index:3}
+.search-clear:disabled~.tk-mic{right:9px}
+.tk-mic.on{background:rgba(var(--ac),.3);color:#fff;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(var(--ac),.15)}}
+.tk-fab{position:fixed;right:14px;bottom:calc(92px + var(--safe-b));width:44px;height:44px;border-radius:50%;border:1px solid var(--line-strong);background:rgba(255,255,255,.1);color:#fff;font-size:18px;cursor:pointer;z-index:24;opacity:0;pointer-events:none;transition:opacity .2s;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.tk-fab.show{opacity:1;pointer-events:auto}
+.tk-bg{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(6,10,14,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.tk-bg.show{display:flex}
+.tk-sheet{width:min(500px,100%);max-height:88dvh;overflow:auto;padding:20px;border-radius:24px;background:rgba(26,34,44,.78);border:1px solid var(--line-strong);box-shadow:var(--g-edge),0 30px 80px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(30px) saturate(150%);backdrop-filter:blur(30px) saturate(150%);animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(24px);opacity:0}}
+.tk-sheet h3{margin:0 0 4px;font-size:17px;color:#fff}
+.tk-sheet p{margin:0 0 14px;color:var(--ink-faint);font-size:12.5px}
+.tk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.tk-opt{display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 6px;min-height:84px;border:1px solid var(--line);border-radius:16px;background:var(--glass);color:var(--ink);font:600 12px inherit;font-family:inherit;cursor:pointer;box-shadow:var(--g-edge)}
+.tk-opt:hover,.tk-opt:focus-visible{border-color:rgba(var(--ac),.6);background:rgba(var(--ac),.12)}
+.tk-opt i{font-style:normal;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-size:13px;font-weight:800;color:#0E141B;background:var(--c,#aab)}
+.tk-opt.main{grid-column:1/-1;flex-direction:row;justify-content:center;min-height:54px;background:rgba(var(--ac),.16);border-color:rgba(var(--ac),.5);font-size:14px}
+.tk-keys{display:grid;grid-template-columns:auto 1fr;gap:9px 14px;align-items:center;font-size:13px;color:var(--ink-soft)}
+.tk-keys kbd{justify-self:end;padding:2px 8px;border:1px solid var(--line-strong);border-radius:7px;background:rgba(255,255,255,.08);color:#fff;font:600 11.5px ui-monospace,Consolas,monospace;white-space:nowrap}
+.tk-close{width:100%;margin-top:14px;min-height:44px;border:1px solid var(--line);border-radius:14px;background:var(--glass);color:var(--ink-soft);font:600 13px inherit;font-family:inherit;cursor:pointer}
+@media(max-width:700px){
+.quickbar{display:grid;grid-template-columns:1fr 1fr;overflow:visible;gap:8px}
+.quickbar .q-label,.quickbar .tk-kbdbtn{display:none}
+.quickbar>.qbtn{min-height:44px;padding:0 8px;text-align:center}
+.quickbar>.qbtn:nth-of-type(5){grid-column:1/-1}
+#categories{flex-wrap:wrap;overflow:visible;margin:0;padding:0;gap:8px;scroll-snap-type:none}
+#categories .chip{flex:1 1 auto;min-height:40px;padding:8px 12px;font-size:12.5px;text-align:left}
+.tk-bg{align-items:flex-end;padding:0}
+.tk-sheet{border-radius:24px 24px 0 0;padding-bottom:calc(20px + var(--safe-b))}
+#stickyPrint{display:none}
+}}
+@media print{.tk-bg,.tk-fab,.tk-mic{display:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">TSKO </div>
+    <h1>Texnik xizmat kalkulyatori</h1>
+    <p class="sub">Aloqa vositalari, radioelektron, kompyuter, ofis va maxsus texnikalarni diagnostika qilish, texnik xizmat ko‘rsatish va joriy ta’mirlash ishlari bo‘yicha</p>
+  </header>
+
+
+
+  <div class="quickbar no-print" aria-label="Tezkor boshqaruv">
+    <span class="q-label">Tezkor</span>
+    <button class="qbtn primary" id="quickSave">Saqlash</button>
+    <button class="qbtn" id="quickHistory">Ishlar</button>
+    <button class="qbtn" id="quickUndo">↶ Bekor qilish</button>
+    <button class="qbtn" id="quickRedo">↷ Qaytarish</button>
+    <button class="qbtn" id="quickBulk">Ommaviy miqdor</button>
+        <span class="quick-status" id="quickStatus"><strong>Shortcuts:</strong> <span class="kbd">/</span> qidiruv · <span class="kbd">Ctrl+S</span> saqlash · <span class="kbd">Esc</span> yopish</span>
+  </div>
+  <div class="bulk-row no-print" id="bulkRow">
+    <span>Ko‘rinayotgan xizmatlarning barchasiga miqdor:</span>
+    <input class="bulk-input" id="bulkQty" type="number" min="0" max="9999" value="1" aria-label="Bulk miqdor">
+    <button class="qbtn primary" id="applyBulk">Qo‘llash</button>
+    <button class="qbtn" id="clearBulk">0 qilish</button>
+  </div>
+
+  <section class="card no-print">
+    <h2>1. Ish turini tanlang</h2>
+    <p class="hint">Avval ish turini tanlang. Narxlar tanlangan ish turiga qarab o‘zgaradi.</p>
+    <div class="chips" id="categories"></div>
+  </section>
+
+  <div class="main-grid">
+  <section class="card no-print">
+    <h2>2. Xizmatni toping va miqdorini kiriting</h2>
+    <div class="search-wrap">
+      <input class="search" id="search" type="search" placeholder="Nomi, kodi yoki kalit so‘z…" aria-label="Xizmatlarni qidirish" autocomplete="off" spellcheck="false">
+      <button type="button" class="search-clear" id="clearSearch" aria-label="Qidiruvni tozalash" title="Tozalash">Esc</button>
+    </div>
+    <div class="search-meta">
+      <span id="searchMeta">Barcha xizmatlar</span>
+      <span><span class="hint-key">/</span> tez qidiruv · <span class="hint-key">Enter</span> birinchi natijani tanlash</span>
+    </div>
+    <div class="list-head" aria-hidden="true">
+      <span>Kod</span><span>Qurilma</span><span>Narx</span><span>Miqdor</span><span>Jami</span>
+    </div>
+    <div class="list" id="services" aria-live="polite"></div>
+    <p class="count-line no-print" id="countLine"></p>
+    <p class="note no-print">I toifa — standart konstruksiya (qismlarga kirish qulay). II toifa — murakkab konstruksiya (korpusni ochish va qismlarga ajratish kerak). Telefon, monoblok, monitor va televizorlarga taalluqli.</p>
+  </section>
+
+  <section class="card" id="cartCard">
+    <h2 class="no-print">3. Tanlangan xizmatlar</h2>
+    <div id="cartList"></div>
+    <div class="total-line">
+      <span class="label" id="cartCountLabel">Jami</span>
+      <span class="value mono" id="total">0 so'm</span>
+    </div>
+    <p class="note">Xizmatlar qiymatiga ehtiyot qismlar, materiallar va QQS kiritilmagan. Ular xizmat ko‘rsatish jarayonida alohida qo‘shiladi.</p>
+    <div class="btnrow no-print">
+      <button class="btn secondary" id="copyBtn" disabled>Nusxa olish</button>
+      <button class="btn ghost" id="printBtn" disabled>Chop etish / PDF</button>
+      <button class="btn ghost" id="clearBtn" disabled>Hammasini tozalash</button>
+    </div>
+  </section>
+  </div>
+
+</div>
+
+<div id="printSheet" aria-hidden="true"></div>
+
+<div class="sticky no-print" id="stickyBar" style="display:none">
+  <div>
+    <div class="s-label" id="stickyLabel">Jami</div>
+    <div class="s-value mono" id="stickyTotal">0 so'm</div>
+  </div>
+  <div class="s-actions">
+    <button id="stickyCopy" aria-label="Nusxa olish">Nusxa</button>
+    <button id="stickyPrint" aria-label="Chop etish">Chop etish</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="modal-backdrop no-print" id="rapidModal" role="dialog" aria-modal="true" aria-labelledby="rapidTitle">
+  <div class="modal">
+    <div class="m-head">
+      <div><h3 id="rapidTitle">Ish stoli</h3><p>Smetalarni saqlang, keyinroq qayta oching va zaxira nusxa oling. Ma’lumotlar faqat shu brauzerda saqlanadi.</p></div>
+      <button class="m-x" id="modalClose" aria-label="Yopish">✕</button>
+    </div>
+    <section class="m-sec">
+      <h4>Hozirgi smetani saqlash</h4>
+      <div class="m-save"><input class="job-name" id="jobName" maxlength="80" placeholder="Ish nomi (masalan: Bugungi smeta)" autocomplete="off"><button class="qbtn primary" id="modalSave">Saqlash</button></div>
+      <div class="m-hint" id="saveHint"></div>
+    </section>
+    <section class="m-sec"><h4>Saqlangan ishlar <span id="jobsCount"></span></h4><div class="jobs" id="jobsList"></div></section>
+    <section class="m-sec m-tools">
+      <button class="m-tool" id="modalCopyTable">Jadvalni nusxalash<small>Excel / Sheets uchun</small></button>
+      <button class="m-tool" id="modalExport">Zaxira fayl (JSON)<small>Yuklab olish</small></button>
+      <button class="m-tool" id="modalImport">Zaxiradan tiklash<small>JSON faylni tanlash</small></button>
+    </section>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <div class="m-foot"><span class="kbd">Esc</span> yopish · <span class="kbd">Ctrl</span>+<span class="kbd">S</span> saqlash</div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+"use strict";
+
+const C={diagnostics:'Diagnostika', maintenance:'Texnik xizmat', repair:'Ta’mirlash'};
+
+
+// const services=[
+// [219,'Kompyuterni o‘rnatish va ulash',38968.09,'hardware'],
+// [220,'Ona platani (MB) o‘rnatish',30135.32,'hardware'],
+// [221,'Protsessorni (CPU) o‘rnatish',12989.36,'hardware'],
+// [222,'Ovoz kartasi, tarmoq platasi yoki televizor pristavkasini o‘rnatish',12989.36,'hardware,network'],
+// [223,'Videokartani (GPU) o‘rnatish',17145.96,'hardware'],
+// [224,'Quvvat blokini (PSU) o‘rnatish',34291.92,'hardware'],
+// [225,'Optik disk yuritmasini o‘rnatish',8313.19,'hardware'],
+// [226,'Tezkor xotirani (RAM) o‘rnatish',17145.96,'hardware'],
+// [227,'Interfeys platasini o‘rnatish',12989.36,'hardware'],
+// [228,'HDD, SSD yoki NVMe saqlash qurilmasini o‘rnatish',21302.55,'hardware,disk'],
+// [229,'Protsessor yoki videokarta sovutgichini o‘rnatish',34291.92,'hardware'],
+// [230,'Tashqi modem, videokamera, joystik va boshqa o‘yin qurilmalarini ulash',12989.36,'hardware'],
+// [231,'Skaner, printer hamda televizorni HDMI orqali ulash',25978.73,'hardware,printer'],
+// [232,'Bitta yoki bir nechta monitorni ulash',43124.68,'hardware'],
+// [233,'Flesh-karta o‘qish qurilmasini ulash',17145.96,'hardware'],
+// [234,'UPS (uzluksiz quvvat manbai)ni ulash',21302.55,'hardware'],
+// [235,'A4 formatdagi printerni ulash',25978.73,'printer'],
+// [236,'A3 formatdagi printerni ulash',51957.45,'printer'],
+// [237,'Yangi kompyuterni yig‘ish (mavjud barcha butlovchi qismlarni kompyuter korpusiga o‘rnatish), butlovchi qismlar soni minimal bo‘lgan holatda',67544.69,'hardware'],
+// [238,'Linux oilasiga mansub operatsion tizimni o‘rnatish va dastlabki sozlash',103914.90,'windows'],
+// [239,'Linux tizimidagi nosozliklarni diagnostika qilish va bartaraf etish',155872.35,'windows'],
+// [240,'Windows/Linux qo‘shaloq yuklanishni (Dual Boot) sozlash',259787.25,'windows'],
+// [241,'Kompyuterni tizimli tayyorlash',77936.18,'windows'],
+// [242,'Tizim komponentlarini faollashtirish',17145.96,'windows'],
+// [243,'Foydalanuvchining mahalliy hisob qaydnomasini yaratish va sozlash',38968.09,'windows'],
+// [244,'BIOSni (UEFI/Legacy) konfiguratsiya qilish',12989.36,'windows,hardware'],
+// [245,'Secure Boot va TPMni sozlash',12989.36,'windows,security'],
+// [246,'Operatsion tizimga kirishni tiklash (parolni qayta o‘rnatish yoki parolni olib tashlash)',25978.73,'windows'],
+// [247,'Windowsi qayta o‘rnatmasdan operatsion tizimni boshlang‘ich holatiga qaytarish',155872.35,'windows'],
+// [248,'Windowsi qayta o‘rnatmasdan uning ishlash qobiliyatini tiklash',51957.45,'windows'],
+// [249,'Fayllarning zaxira nusxasini yaratish',34291.92,'windows,disk,backup'],
+// [250,'Operatsion tizim yangilanish paketini o‘rnatish',51957.45,'windows'],
+// [251,'Operatsion tizimning muhim yangilanishlarini yuklab olish va o‘rnatish',25978.73,'windows'],
+// [252,'Microsoft Office dasturini o‘rnatish',46761.71,'software'],
+// [253,'Microsoft Office dasturini sozlash',25978.73,'software'],
+// [254,'Microsoft Office dasturini qayta o‘rnatish',77936.18,'software'],
+// [255,'Qo‘shimcha foydalanuvchi dasturlarini sozlash',15587.24,'software'],
+// [256,'Qo‘shimcha foydalanuvchi dasturlarini qayta o‘rnatish (1 dona)',25978.73,'software'],
+// [257,'Ichki qurilmalar drayverlarini o‘rnatish va sozlash (1 dona)',12989.36,'software,hardware'],
+// [258,'Drayverni Internet orqali qidirish va yuklab olish',51957.45,'software'],
+// [259,'Kompyuter apparat komponentlari va periferik qurilmalarini sozlash',25978.73,'hardware'],
+// [260,'BIOS mikrodasturini yangilash',38968.09,'hardware,windows'],
+// [261,'Doimiy xotira qurilmasini tekshirish va optimizatsiyalash',34291.92,'disk'],
+// [262,'Kompyuterni tekshirish, viruslarni aniqlash hamda olib tashlash',51957.45,'security'],
+// [263,'Antivirus dasturlarini o‘rnatish',18185.11,'security'],
+// [264,'Antivirus dasturlarini sozlash',17145.96,'security'],
+// [265,'Antivirus dasturi bazasini yangilash',12989.36,'security'],
+// [266,'Flesh-xotiradan viruslarni o‘chirish',25978.73,'security'],
+// [267,'Windowsning ichki vositalari yordamida ma’lumotlarni zaxira nusxalash tizimini sozlash',51957.45,'backup,server'],
+// [268,'Foydalanuvchini Active Directory(domen)ga ulash',51957.45,'server'],
+// [269,'Active Directory(domen)da foydalanuvchi parametrlarini sozlash',25978.73,'server'],
+// [270,'Foydalanuvchini Active Directory(domen)dan chiqarish',51957.45,'server'],
+// [271,'E-xat va The Bat! korporativ pochta serverini o‘rnatish va sozlash',25978.73,'server'],
+// [272,'Tarmoq papkalari va resurslariga kirish hamda umumiy foydalanish huquqlarini sozlash',25978.73,'server,network'],
+// [273,'Xavfsizlik siyosatini aniqlash va sozlash',77936.18,'server,security'],
+// [274,'Ma’lumotlarga kirish huquqlarini chegaralash',77936.18,'server,security'],
+// [275,'Nosoz ma’lumot tashuvchidan ma’lumotlarini sozlash',8313.19,'disk'],
+// [276,'Foydalanuvchi ma’lumotlarini ko‘chirish',51957.45,'disk'],
+// [277,'Qattiq disk bo‘limini formatlash',15587.24,'disk'],
+// [278,'Disk maydonini bo‘limlarga bo‘lish',15587.24,'disk'],
+// [279,'Ma’lumotlarni yo‘qotmagan holda MBRni GPTga o‘tkazish',15587.24,'disk'],
+// [280,'Ma’lumotlarni saqlagan holda disk maydonini qayta bo‘lish',25978.73,'disk'],
+// [281,'BitLocker yordamida shifrlangan disklarni deshifrlash',25978.73,'disk,security'],
+// [282,'Mantiqiy xatolarni tuzatish (HDD, MBR, ISA)',103914.90,'disk'],
+// [283,'Diskni keraksiz fayllardan tozalash',15587.24,'disk'],
+// [284,'Reyestrni tozalash',25978.73,'disk,windows'],
+// [285,'Defragmentatsiya',103914.90,'disk'],
+// [286,'Dasturlar va drayverlarni o‘chirish',8313.19,'software'],
+// [287,'Doimiy xotiradagi xatolar mavjudligini tekshirish va ularni bartaraf etish',155872.35,'disk'],
+// [288,'Tarmoqdagi shikastlanishlarni bartaraf etish',20782.98,'network'],
+// [289,'Mahalliy tarmoq nuqtasini montaj qilish: kabelni qisish va tarmoq rozetkasini o‘rnatish (1 dona)',7274.04,'network'],
+// [290,'Marshrutizator yoki kommutatorni (Router/Switch) o‘rnatish',25978.73,'network'],
+// [291,'Devor va shifllarda teshiklar ochish',51957.45,'network,other'],
+// [292,'Tarmoq uskunalarini tekshirish va sozlash',25978.73,'network'],
+// [293,'Ko‘p funksiyali qurilmani (3 tasi 1 da KFQ) diagnostika qilish',51957.45,'printer'],
+// [294,'Ko‘p funksiyali qurilmaning (3 tasi 1 da KFQ) alohida elementi yoki blokini (ventilyator, termoplyonka, qog‘oz uzatish roligi, rezina val va boshqalar) almashtirish va o‘rnatish',207829.80,'printer'],
+// [295,'Lazerli printerni diagnostika qilish',51957.45,'printer'],
+// [296,'Lazerli printerning alohida elementi yoki blokini (ventilyator, termoplyonka, qog‘oz uzatish roligi, teflon val, termoblok, quvvat manbai, elektr dvigatel, qog‘oz uzatish mexanizmi, tishli g‘ildiraklar bloki va boshqalar) almashtirish va o‘rnatish',155872.35,'printer'],
+// [297,'Siyoh purkagichli printerlarni diagnostika qilish',103914.90,'printer'],
+// [298,'Siyoh purkagichli printerlarning alohida elementi yoki blokini almashtirish',207829.80,'printer'],
+// [299,'A3 formatdagi ko‘p funksiyali qurilmani (KFQ) diagnostika qilish',129893.63,'printer'],
+// [300,'A3 formatdagi ko‘p funksiyali qurilmaning (KFQ) alohida elementi yoki blokini almashtirish',207829.80,'printer'],
+// [301,'Lazerli printer kartridjini to‘ldirish',12989.36,'printer'],
+// [302,'Siyoh purkagichli printer kartridjini to‘ldirish',34811.49,'printer'],
+// [303,'Kartridj fotobarabanini almashtirish',8832.77,'printer'],
+// [304,'Kartridj rakelini almashtirish',17145.96,'printer'],
+// [305,'Kartridj magnit valini almashtirish',25978.73,'printer'],
+// [306,'Kartridj zaryad roligini almashtirish',8832.77,'printer'],
+// [307,'Kartridjni toner chiqindilaridan tozalash',8832.77,'printer'],
+// [308,'Siyoh purkagichli printerning bosib qilish kallaqin fazlash va sinovdan o‘tkazish',259787.25,'printer'],
+// [309,'Kartridj dozalash pichog‘ini almashtirish',17145.96,'printer'],
+// [310,'Lazerli printer toner-kartridjini almashtirish',8832.77,'printer'],
+// [311,'Printerni profilaktik tozalash',41565.96,'printer'],
+// [312,'Xizmat ko‘rsatish hisoblagichini nolga tushirish',51957.45,'printer']
+// ];
+
+const RAW=[
+[1,'Statsionar radiostansiyalar',51957.45,'diagnostics'],
+[2,'UQT retranslyatorlari',77936.18,'diagnostics'],
+[3,'Avtomobil radiostansiyalar',51957.45,'diagnostics'],
+[4,'Turli rusumdagi radiostansiyalar uchun manipulyator',25978.73,'diagnostics'],
+[5,'Portativ radiostansiyalar',25978.73,'diagnostics'],
+[6,'Portativ radiostansiyalar uchun akkumulyatorlar',5195.75,'diagnostics'],
+[7,'Radiostansiyalar uchun zaryadlash qurilmasi',25978.73,'diagnostics'],
+[8,'Elektr stabilizatori va avtomatik zaryadlash qurilmasi bilan tarmoq quvvat manbalari',25978.73,'diagnostics'],
+[9,'2 ampergacha bo‘lgan impulsli quvvat manbalari',25978.73,'diagnostics'],
+[10,'2 amperdan yuqori bo‘lgan impulsli quvvat manbalari',25978.73,'diagnostics'],
+[11,'10 ampergacha bo‘lgan transformatorli quvvat manbalari',25978.73,'diagnostics'],
+[12,'10 amperdan yuqori bo‘lgan transformatorli quvvat manbalari',25978.73,'diagnostics'],
+[13,'Yong‘in signalizatsiyasi va ogohlantirish tizimlari',69103.41,'diagnostics'],
+[14,'Signal beruvchi ovoz kuchaytirgich qurilmalarini ta’mirlash',25978.73,'diagnostics'],
+[15,'Avtomobil yorug‘lik qurilmasi',25978.73,'diagnostics'],
+[16,'50 Vtgacha quvvatli past chastotali kuchaytirgich',25978.73,'diagnostics'],
+[17,'100 Vtgacha quvvatli past chastotali kuchaytirgich',60270.64,'diagnostics'],
+[18,'Simli mikrofonlar',25978.73,'diagnostics'],
+[19,'Radiomikrofonlar',25978.73,'diagnostics'],
+[20,'Ovoz kuchaytirgich kolonkalari',25978.73,'diagnostics'],
+[21,'Liniyaviy kuchaytirgich',51957.45,'diagnostics'],
+[22,'Statsionar videokuzatuv kameralari',77936.18,'diagnostics'],
+[23,'Harakatlanuvchi videokuzatuv kameralari',77936.18,'diagnostics'],
+[24,'Videokontrol qurilmasi, pristavkalar',103914.90,'diagnostics'],
+[25,'Masofadan boshqarish pulti (IQ)',25978.73,'diagnostics'],
+[26,'Kommutatsiya bloki',25978.73,'diagnostics'],
+[27,'Yo‘naltirish qurilmalari',51957.45,'diagnostics'],
+[28,'Taqsimlovchi kuchaytirgich',25978.73,'diagnostics'],
+[29,'Elektromegafon',25978.73,'diagnostics'],
+[30,'So‘zlashuv qurilmalari',25978.73,'diagnostics'],
+[31,'Planshet',51957.45,'diagnostics'],
+[32,'Body-kamera',51957.45,'diagnostics'],
+[33,'Laboratoriya va o‘lchov asboblari',51957.45,'diagnostics'],
+[34,'Tezkor aloqa stansiyalari',51957.45,'diagnostics'],
+[35,'Analog telefon apparatlari',17145.96,'diagnostics'],
+[36,'Raqamli telefon apparatlari',25978.73,'diagnostics'],
+[37,'Tezlikni o‘lchash qurilmasi',51957.45,'diagnostics'],
+[38,'Radioipriyomniklar',51957.45,'diagnostics'],
+[39,'Fotoapparatsiz reproduksion qurilmalar',51957.45,'diagnostics'],
+[40,'Yoritgichlar (ultra binafsha), akkumulyatorli fonarlar',25978.73,'diagnostics'],
+[41,'Barcha rusumdagi fotokattalashtirgichlar',17145.96,'diagnostics'],
+[42,'Elektron chaqmoq lampalari',25978.73,'diagnostics'],
+[43,'IQ nurlarining elektron-optik o‘zgartirgichlari',25978.73,'diagnostics'],
+[44,'Reproduksion qurilmalar',51957.45,'diagnostics'],
+[45,'Tungi ko‘rish asboblari',51957.45,'diagnostics'],
+[46,'«Rassvet», «Raduga» va boshqa maktablar',51957.45,'diagnostics'],
+[47,'Barcha rusumdagi fotoobyektivlar',17145.96,'diagnostics'],
+[48,'Barcha rusumdagi fotoapparatlari',25978.73,'diagnostics'],
+[49,'Barcha rusum va ishlab chiqaruvchilarning qo‘li metallodetektorlari',17145.96,'diagnostics'],
+[50,'Barcha rusum va ishlab chiqaruvchilarning metallodetektorlari',25978.73,'diagnostics'],
+[51,'Barcha rusumdagi analog diktofonlar',25978.73,'diagnostics'],
+[52,'Barcha rusumdagi mini raqamli diktofonlar',25978.73,'diagnostics'],
+[53,'Videokameralar uchun impulsi quvvat manbalari',25978.73,'diagnostics'],
+[54,'Faks apparatlari',51957.45,'diagnostics'],
+[55,'Monitor (I toifa)',51957.45,'diagnostics'],
+[56,'Monitor (II toifa)',25978.73,'diagnostics'],
+[57,'Televizor (I toifa)',51957.45,'diagnostics'],
+[58,'Televizor (II toifa)',25978.73,'diagnostics'],
+[59,'Barcha rusumdagi videomagnitofonlar',25978.73,'diagnostics'],
+[60,'Barcha rusumdagi monobloklar',51957.45,'diagnostics'],
+[61,'Barcha rusumdagi ovoz ijro etish qurilmalari',77936.18,'diagnostics'],
+[62,'Elektron qulf',51957.45,'diagnostics'],
+[63,'Komparator (ekspertiza o‘tkazish qurilmasi)',51957.45,'diagnostics'],
+[64,'Elektron mikroskop',51957.45,'diagnostics'],
+[65,'Barcha rusumdagi domofonlar',25978.73,'diagnostics'],
+[66,'Barcha rusumdagi isitkichlar',25978.73,'diagnostics'],
+[67,'Barcha rusumdagi ventilyatorlar',25978.73,'diagnostics'],
+[68,'Barcha rusumdagi elektr plitalar',17145.96,'diagnostics'],
+[69,'Barcha rusumdagi elektron tarozilar',25978.73,'diagnostics'],
+[70,'Barcha rusumdagi elektr qozonlar',17145.96,'diagnostics'],
+[71,'Elektr drel va perforatorlar',51957.45,'diagnostics'],
+[72,'Mikrokalkulyatorlar, kalkulyatorlar',25978.73,'diagnostics'],
+[73,'Qog‘oz maydalagich qurilmasi',51957.45,'diagnostics'],
+[74,'Barcha rusumdagi changyutgichlar',25978.73,'diagnostics'],
+[75,'Barcha rusumdagi maishiy muzlatkichlar',25978.73,'diagnostics'],
+[76,'Barcha rusumdagi maishiy konditsionerlar',51957.45,'diagnostics'],
+[77,'Barcha rusumdagi fenlar',17145.96,'diagnostics'],
+[78,'Barcha rusumdagi mikroto‘lqinli pechlar',25978.73,'diagnostics'],
+[79,'Barcha rusumdagi dazmollar',8313.19,'diagnostics'],
+[80,'Barcha rusumdagi mobil telefonlar',25978.73,'diagnostics'],
+[81,'Barcha rusumdagi mobil telefonlar',51957.45,'diagnostics'],
+[82,'Monoblok (I toifa)',51957.45,'diagnostics'],
+[83,'Monoblok (II toifa)',51957.45,'diagnostics'],
+[84,'Kompyuter tizim bloki',51957.45,'diagnostics'],
+[85,'Lazerli oq-qora, siyoh purkagichli oq-qora printlar',51957.45,'diagnostics'],
+[86,'Lazerli rangli, siyoh purkagichli rangli printlar',51957.45,'diagnostics'],
+[87,'Turli rusumdagi skanerlar',51957.45,'diagnostics'],
+[88,'Turli rusumdagi 3 tasi 1 da oq-qora KFQ qurilmalari',51957.45,'diagnostics'],
+[89,'Turli rusumdagi 3 tasi 1 da rangli KFQ qurilmalari',51957.45,'diagnostics'],
+[90,'Modem, hub, switch',25978.73,'diagnostics'],
+[91,'Barcha rusumdagi noutbuklar',51957.45,'diagnostics'],
+[92,'Uzluksiz elektr ta’minoti manbai (UPS)',77936.18,'diagnostics'],
+[1,'Statsionar radiostansiyalar',103914.90,'maintenance'],
+[2,'UQT retranslyatorlari',103914.90,'maintenance'],
+[3,'Avtomobil radiostansiyalar',103914.90,'maintenance'],
+[4,'Turli rusumdagi radiostansiyalar uchun manipulyator',25978.73,'maintenance'],
+[5,'Portativ radiostansiyalar',51957.45,'maintenance'],
+[6,'Portativ radiostansiyalar uchun akkumulyatorlar',5195.75,'maintenance'],
+[7,'Radiostansiyalar uchun zaryadlash qurilmasi',25978.73,'maintenance'],
+[8,'Elektr stabilizatori va avtomatik zaryadlash qurilmasi bilan tarmoq quvvat manbalari',51957.45,'maintenance'],
+[9,'2 ampergacha bo‘lgan impulsli quvvat manbalari',51957.45,'maintenance'],
+[10,'2 amperdan yuqori bo‘lgan impulsli quvvat manbalari',51957.45,'maintenance'],
+[11,'10 ampergacha bo‘lgan transformatorli quvvat manbalari',51957.45,'maintenance'],
+[12,'10 amperdan yuqori bo‘lgan transformatorli quvvat manbalari',51957.45,'maintenance'],
+[13,'Yong‘in signalizatsiyasi va ogohlantirish tizimlari',103914.90,'maintenance'],
+[14,'Signal beruvchi ovoz kuchaytirgich qurilmalarini ta’mirlash',51957.45,'maintenance'],
+[15,'Avtomobil yorug‘lik qurilmasi',69103.41,'maintenance'],
+[16,'50 Vtgacha quvvatli past chastotali kuchaytirgich',51957.45,'maintenance'],
+[17,'100 Vtgacha quvvatli past chastotali kuchaytirgich',77936.18,'maintenance'],
+[18,'Simli mikrofonlar',25978.73,'maintenance'],
+[19,'Radiomikrofonlar',36370.22,'maintenance'],
+[20,'Ovoz kuchaytirgich kolonkalari',25978.73,'maintenance'],
+[21,'Liniyaviy kuchaytirgich',86249.37,'maintenance'],
+[22,'Statsionar videokuzatuv kameralari',103914.90,'maintenance'],
+[23,'Harakatlanuvchi videokuzatuv kameralari',129893.63,'maintenance'],
+[24,'Videokontrol qurilmasi, pristavkalar',103914.90,'maintenance'],
+[25,'Masofadan boshqarish pulti (IQ)',25978.73,'maintenance'],
+[26,'Kommutatsiya bloki',51957.45,'maintenance'],
+[27,'Yo‘naltirish qurilmalari',51957.45,'maintenance'],
+[28,'Taqsimlovchi kuchaytirgich',51957.45,'maintenance'],
+[29,'Elektromegafon',51957.45,'maintenance'],
+[30,'So‘zlashuv qurilmalari',60270.64,'maintenance'],
+[31,'Planshet',103914.90,'maintenance'],
+[32,'Body-kamera',103914.90,'maintenance'],
+[33,'Laboratoriya va o‘lchov asboblari',103914.90,'maintenance'],
+[34,'Tezkor aloqa stansiyalari',51957.45,'maintenance'],
+[35,'Analog telefon apparatlari',25978.73,'maintenance'],
+[36,'Raqamli telefon apparatlari',25978.73,'maintenance'],
+[37,'Tezlikni o‘lchash qurilmasi',51957.45,'maintenance'],
+[38,'Radioipriyomniklar',51957.45,'maintenance'],
+[39,'Fotoapparatsiz reproduksion qurilmalar',51957.45,'maintenance'],
+[40,'Yoritgichlar (ultra binafsha), akkumulyatorli fonarlar',25978.73,'maintenance'],
+[41,'Barcha rusumdagi fotokattalashtirgichlar',25978.73,'maintenance'],
+[42,'Elektron chaqmoq lampalari',60270.64,'maintenance'],
+[43,'IQ nurlarining elektron-optik o‘zgartirgichlari',60270.64,'maintenance'],
+[44,'Reproduksion qurilmalar',51957.45,'maintenance'],
+[45,'Tungi ko‘rish asboblari',51957.45,'maintenance'],
+[46,'«Rassvet», «Raduga» va boshqa maktablar',77936.18,'maintenance'],
+[47,'Barcha rusumdagi fotoobyektivlar',51957.45,'maintenance'],
+[48,'Barcha rusumdagi fotoapparatlari',51957.45,'maintenance'],
+[49,'Barcha rusum va ishlab chiqaruvchilarning qo‘li metallodetektorlari',25978.73,'maintenance'],
+[50,'Barcha rusum va ishlab chiqaruvchilarning metallodetektorlari',51957.45,'maintenance'],
+[51,'Barcha rusumdagi analog diktofonlar',51957.45,'maintenance'],
+[52,'Barcha rusumdagi mini raqamli diktofonlar',51957.45,'maintenance'],
+[53,'Videokameralar uchun impulsi quvvat manbalari',51957.45,'maintenance'],
+[54,'Faks apparatlari',51957.45,'maintenance'],
+[55,'Monitor (I toifa)',77936.18,'maintenance'],
+[56,'Monitor (II toifa)',51957.45,'maintenance'],
+[57,'Televizor (I toifa)',77936.18,'maintenance'],
+[58,'Televizor (II toifa)',51957.45,'maintenance'],
+[59,'Barcha rusumdagi videomagnitofonlar',51957.45,'maintenance'],
+[60,'Barcha rusumdagi monobloklar',103914.90,'maintenance'],
+[61,'Barcha rusumdagi ovoz ijro etish qurilmalari',77936.18,'maintenance'],
+[62,'Elektron qulf',103914.90,'maintenance'],
+[63,'Komparator (ekspertiza o‘tkazish qurilmasi)',103914.90,'maintenance'],
+[64,'Elektron mikroskop',103914.90,'maintenance'],
+[65,'Barcha rusumdagi domofonlar',51957.45,'maintenance'],
+[66,'Barcha rusumdagi isitkichlar',25978.73,'maintenance'],
+[67,'Barcha rusumdagi ventilyatorlar',25978.73,'maintenance'],
+[68,'Barcha rusumdagi elektr plitalar',25978.73,'maintenance'],
+[69,'Barcha rusumdagi elektron tarozilar',25978.73,'maintenance'],
+[70,'Barcha rusumdagi elektr qozonlar',17145.96,'maintenance'],
+[71,'Elektr drel va perforatorlar',51957.45,'maintenance'],
+[72,'Mikrokalkulyatorlar, kalkulyatorlar',25978.73,'maintenance'],
+[73,'Qog‘oz maydalagich qurilmasi',51957.45,'maintenance'],
+[74,'Barcha rusumdagi changyutgichlar',51957.45,'maintenance'],
+[75,'Barcha rusumdagi maishiy muzlatkichlar',51957.45,'maintenance'],
+[76,'Barcha rusumdagi maishiy konditsionerlar',207829.80,'maintenance'],
+[77,'Barcha rusumdagi fenlar',25978.73,'maintenance'],
+[78,'Barcha rusumdagi mikroto‘lqinli pechlar',51957.45,'maintenance'],
+[79,'Barcha rusumdagi dazmollar',17145.96,'maintenance'],
+[80,'Barcha rusumdagi mobil telefonlar',51957.45,'maintenance'],
+[81,'Barcha rusumdagi mobil telefonlar',51957.45,'maintenance'],
+[82,'Monoblok (I toifa)',103914.90,'maintenance'],
+[83,'Monoblok (II toifa)',129893.63,'maintenance'],
+[84,'Kompyuter tizim bloki',77936.18,'maintenance'],
+[85,'Lazerli oq-qora, siyoh purkagichli oq-qora printlar',51957.45,'maintenance'],
+[86,'Lazerli rangli, siyoh purkagichli rangli printlar',51957.45,'maintenance'],
+[87,'Turli rusumdagi skanerlar',62348.94,'maintenance'],
+[88,'Turli rusumdagi 3 tasi 1 da oq-qora KFQ qurilmalari',62348.94,'maintenance'],
+[89,'Turli rusumdagi 3 tasi 1 da rangli KFQ qurilmalari',103914.90,'maintenance'],
+[90,'Modem, hub, switch',60270.64,'maintenance'],
+[91,'Barcha rusumdagi noutbuklar',129893.63,'maintenance'],
+[92,'Uzluksiz elektr ta’minoti manbai (UPS)',103914.90,'maintenance'],
+[1,'Statsionar radiostansiyalar',207829.80,'repair'],
+[2,'UQT retranslyatorlari',207829.80,'repair'],
+[3,'Avtomobil radiostansiyalar',207829.80,'repair'],
+[4,'Turli rusumdagi radiostansiyalar uchun manipulyator',51957.45,'repair'],
+[5,'Portativ radiostansiyalar',129893.63,'repair'],
+[6,'Portativ radiostansiyalar uchun akkumulyatorlar',25978.73,'repair'],
+[7,'Radiostansiyalar uchun zaryadlash qurilmasi',51957.45,'repair'],
+[8,'Elektr stabilizatori va avtomatik zaryadlash qurilmasi bilan tarmoq quvvat manbalari',103914.90,'repair'],
+[9,'2 ampergacha bo‘lgan impulsli quvvat manbalari',103914.90,'repair'],
+[10,'2 amperdan yuqori bo‘lgan impulsli quvvat manbalari',155872.35,'repair'],
+[11,'10 ampergacha bo‘lgan transformatorli quvvat manbalari',103914.90,'repair'],
+[12,'10 amperdan yuqori bo‘lgan transformatorli quvvat manbalari',155872.35,'repair'],
+[13,'Yong‘in signalizatsiyasi va ogohlantirish tizimlari',415659.60,'repair'],
+[14,'Signal beruvchi ovoz kuchaytirgich qurilmalarini ta’mirlash',103914.90,'repair'],
+[15,'Avtomobil yorug‘lik qurilmasi',103914.90,'repair'],
+[16,'50 Vtgacha quvvatli past chastotali kuchaytirgich',103914.90,'repair'],
+[17,'100 Vtgacha quvvatli past chastotali kuchaytirgich',129893.63,'repair'],
+[18,'Simli mikrofonlar',51957.45,'repair'],
+[19,'Radiomikrofonlar',69103.41,'repair'],
+[20,'Ovoz kuchaytirgich kolonkalari',51957.45,'repair'],
+[21,'Liniyaviy kuchaytirgich',103914.90,'repair'],
+[22,'Statsionar videokuzatuv kameralari',207829.80,'repair'],
+[23,'Harakatlanuvchi videokuzatuv kameralari',259787.25,'repair'],
+[24,'Videokontrol qurilmasi, pristavkalar',155872.35,'repair'],
+[25,'Masofadan boshqarish pulti (IQ)',60270.64,'repair'],
+[26,'Kommutatsiya bloki',103914.90,'repair'],
+[27,'Yo‘naltirish qurilmalari',103914.90,'repair'],
+[28,'Taqsimlovchi kuchaytirgich',103914.90,'repair'],
+[29,'Elektromegafon',129893.63,'repair'],
+[30,'So‘zlashuv qurilmalari',129893.63,'repair'],
+[31,'Planshet',415659.60,'repair'],
+[32,'Body-kamera',311744.70,'repair'],
+[33,'Laboratoriya va o‘lchov asboblari',207829.80,'repair'],
+[34,'Tezkor aloqa stansiyalari',155872.35,'repair'],
+[35,'Analog telefon apparatlari',25978.73,'repair'],
+[36,'Raqamli telefon apparatlari',60270.64,'repair'],
+[37,'Tezlikni o‘lchash qurilmasi',155872.35,'repair'],
+[38,'Radioipriyomniklar',103914.90,'repair'],
+[39,'Fotoapparatsiz reproduksion qurilmalar',207829.80,'repair'],
+[40,'Yoritgichlar (ultra binafsha), akkumulyatorli fonarlar',103914.90,'repair'],
+[41,'Barcha rusumdagi fotokattalashtirgichlar',103914.90,'repair'],
+[42,'Elektron chaqmoq lampalari',103914.90,'repair'],
+[43,'IQ nurlarining elektron-optik o‘zgartirgichlari',51957.45,'repair'],
+[44,'Reproduksion qurilmalar',103914.90,'repair'],
+[45,'Tungi ko‘rish asboblari',103914.90,'repair'],
+[46,'«Rassvet», «Raduga» va boshqa maktablar',103914.90,'repair'],
+[47,'Barcha rusumdagi fotoobyektivlar',77936.18,'repair'],
+[48,'Barcha rusumdagi fotoapparatlari',207829.80,'repair'],
+[49,'Barcha rusum va ishlab chiqaruvchilarning qo‘li metallodetektorlari',103914.90,'repair'],
+[50,'Barcha rusum va ishlab chiqaruvchilarning metallodetektorlari',207829.80,'repair'],
+[51,'Barcha rusumdagi analog diktofonlar',103914.90,'repair'],
+[52,'Barcha rusumdagi mini raqamli diktofonlar',155872.35,'repair'],
+[53,'Videokameralar uchun impulsi quvvat manbalari',103914.90,'repair'],
+[54,'Faks apparatlari',103914.9,'repair'],
+[55,'Monitor (I toifa)',311744.7,'repair'],
+[56,'Monitor (II toifa)',207829.8,'repair'],
+[57,'Televizor (I toifa)',311744.70,'repair'],
+[58,'Televizor (II toifa)',207829.80,'repair'],
+[59,'Barcha rusumdagi videomagnitofonlar',207829.8,'repair'],
+[60,'Barcha rusumdagi monobloklar',311744.70,'repair'],
+[61,'Barcha rusumdagi ovoz ijro etish qurilmalari',311744.70,'repair'],
+[62,'Elektron qulf',259787.25,'repair'],
+[63,'Komparator (ekspertiza o‘tkazish qurilmasi)',415659.60,'repair'],
+[64,'Elektron mikroskop',259787.25,'repair'],
+[65,'Barcha rusumdagi domofonlar',103914.90,'repair'],
+[66,'Barcha rusumdagi isitkichlar',51957.45,'repair'],
+[67,'Barcha rusumdagi ventilyatorlar',51957.45,'repair'],
+[68,'Barcha rusumdagi elektr plitalar',36370.22,'repair'],
+[69,'Barcha rusumdagi elektron tarozilar',36370.22,'repair'],
+[70,'Barcha rusumdagi elektr qozonlar',51957.45,'repair'],
+[71,'Elektr drel va perforatorlar',103914.90,'repair'],
+[72,'Mikrokalkulyatorlar, kalkulyatorlar',51957.45,'repair'],
+[73,'Qog‘oz maydalagich qurilmasi',103914.90,'repair'],
+[74,'Barcha rusumdagi changyutgichlar',103914.90,'repair'],
+[75,'Barcha rusumdagi maishiy muzlatkichlar',207829.80,'repair'],
+[76,'Barcha rusumdagi maishiy konditsionerlar',311744.70,'repair'],
+[77,'Barcha rusumdagi fenlar',51957.45,'repair'],
+[78,'Barcha rusumdagi mikroto‘lqinli pechlar',103914.90,'repair'],
+[79,'Barcha rusumdagi dazmollar',25978.73,'repair'],
+[80,'Barcha rusumdagi mobil telefonlar',103914.90,'repair'],
+[81,'Barcha rusumdagi mobil telefonlar',207829.80,'repair'],
+[82,'Monoblok (I toifa)',207829.80,'repair'],
+[83,'Monoblok (II toifa)',311744.70,'repair'],
+[84,'Kompyuter tizim bloki',207829.80,'repair'],
+[85,'Lazerli oq-qora, siyoh purkagichli oq-qora printlar',207829.80,'repair'],
+[86,'Lazerli rangli, siyoh purkagichli rangli printlar',311744.70,'repair'],
+[87,'Turli rusumdagi skanerlar',311744.70,'repair'],
+[88,'Turli rusumdagi 3 tasi 1 da oq-qora KFQ qurilmalari',259787.25,'repair'],
+[89,'Turli rusumdagi 3 tasi 1 da rangli KFQ qurilmalari',311744.70,'repair'],
+[90,'Modem, hub, switch',51957.45,'repair'],
+[91,'Barcha rusumdagi noutbuklar',311744.70,'repair'],
+[92,'Uzluksiz elektr ta’minoti manbai (UPS)',207829.80,'repair']
+];
+// the same device is priced 3 ways -> unique row id = type*1000+code; the list shows ONE type at a time
+const OFF={diagnostics:1000,maintenance:2000,repair:3000};
+const services=RAW.map(r=>[OFF[r[3]]+r[0], r[1], r[2], r[3]]);
+const SHOWCAT=false;
+const cartName=s=>s[1]+' · '+C[s[3]];
+
+const STORAGE_KEY='tx_calc_qty_v4_app1';
+const money=n=>new Intl.NumberFormat('uz-UZ',{maximumFractionDigits:0}).format(Math.round(n))+' so\u2018m';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let qty={};
+try{ const raw=JSON.parse(localStorage.getItem(STORAGE_KEY)); if(raw&&typeof raw==='object') qty=raw; }catch(e){ qty={}; }
+const byCode=Object.fromEntries(services.map(s=>[s[0],s]));
+// drop any stored codes that no longer exist in the price list
+for(const k of Object.keys(qty)){ if(!byCode[k]) delete qty[k]; }
+
+function saveQty(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(qty)); }catch(e){} }
+function getQty(code){ return Number(qty[code])||0; }
+function setQty(code, n){
+  n=Math.min(9999,Math.max(0, Math.floor(Number(n)||0)));
+  if(n===0) delete qty[code]; else qty[code]=n;
+  saveQty();
+  refreshRowVisual(code);
+  renderCart();
+  if(typeof pushHistory==='function') pushHistory();
+}
+
+const selectedCats=new Set(['diagnostics']);
+const catsEl=document.getElementById('categories');
+const TYPE_INFO={diagnostics:'Nosozlikni aniqlash va ekspert xulosasini berish', maintenance:'Rejali xizmat: tekshirish, sozlash, profilaktika', repair:'Joriy ta\u2019mirlash: nosoz qismni almashtirish'};
+for(const [key,label] of Object.entries(C)){
+  const b=document.createElement('button');
+  b.type='button'; b.className='chip seg'; b.dataset.key=key; b.setAttribute('aria-pressed', selectedCats.has(key)?'true':'false');
+  b.innerHTML=`<strong>${esc(label)}</strong><small>${esc(TYPE_INFO[key])}</small>`;
+  b.addEventListener('click',()=>{
+    selectedCats.clear(); selectedCats.add(key);
+    catsEl.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed', x.dataset.key===key?'true':'false'));
+    renderServices();
+  });
+  catsEl.appendChild(b);
+}
+
+const servicesEl=document.getElementById('services');
+const searchEl=document.getElementById('search');
+const clearSearchEl=document.getElementById('clearSearch');
+const searchMetaEl=document.getElementById('searchMeta');
+const countLineEl=document.getElementById('countLine');
+
+function normalizeSearch(v){
+  return String(v||'').toLocaleLowerCase('uz-UZ')
+    .replace(/[ʻʼ’‘`´]/g,"'")
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+function levenshtein(a,b){
+  if(a===b) return 0; if(!a) return b.length; if(!b) return a.length;
+  if(Math.abs(a.length-b.length)>3) return 9;
+  let prev=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){ let cur=[i]; for(let j=1;j<=b.length;j++) cur[j]=Math.min(cur[j-1]+1,prev[j]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); prev=cur; }
+  return prev[b.length];
+}
+function searchScore(service,q){
+  if(!q) return 0;
+  const code=normalizeSearch(service[0]%1000), name=normalizeSearch(service[1]);
+  const categoryNames=service[3].split(',').map(k=>C[k]||k).join(' ');
+  const hay=name+' '+code+' '+normalizeSearch(categoryNames);
+  if(code===q) return 10000;
+  if(code.startsWith(q)) return 8500;
+  if(name===q) return 8000;
+  if(name.startsWith(q)) return 7000;
+  const tokens=q.split(/\s+/).filter(Boolean);
+  const nameTokens=name.split(/\s+/);
+  let score=0, matched=0;
+  for(const t of tokens){
+    if(hay.includes(t)){ matched++; score+=name.includes(t)?900:700; continue; }
+    let best=99; for(const nt of nameTokens){ if(Math.min(nt.length,t.length)>=3) best=Math.min(best,levenshtein(t,nt)); }
+    if(best<=1){ matched++; score+=420; }
+  }
+  if(matched===tokens.length) return score+3000;
+  return matched?score:0;
+}
+function matchingRows(){
+  const q=normalizeSearch(searchEl.value);
+  const filtered=services.filter(s=>{
+    const cats=s[3].split(',');
+    return !selectedCats.size || cats.some(c=>selectedCats.has(c));
+  });
+  if(!q) return filtered;
+  return filtered.map(s=>({s,score:searchScore(s,q)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score || Number(a.s[0])-Number(b.s[0])).map(x=>x.s);
+}
+function updateSearchUI(rows){
+  const q=normalizeSearch(searchEl.value);
+  clearSearchEl.disabled=!searchEl.value;
+  if(!q) searchMetaEl.textContent='Barcha qurilmalar · '+C[[...selectedCats][0]];
+  else searchMetaEl.textContent=rows.length?`${rows.length} ta mos xizmat · natijalar relevanti bo‘yicha saralangan`:'Mos xizmat topilmadi';
+}
+searchEl.addEventListener('input',()=>{renderServices();});
+clearSearchEl.addEventListener('click',()=>{searchEl.value=''; renderServices(); searchEl.focus();});
+searchEl.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){ e.preventDefault(); const first=servicesEl.querySelector('.row input[data-code]'); if(first) first.focus(); }
+  if(e.key==='Escape' && searchEl.value){ e.preventDefault(); searchEl.value=''; renderServices(); }
+});
+
+function renderServices(){
+  const rows=matchingRows();
+  updateSearchUI(rows);
+
+  if(!rows.length){
+    const q=esc(searchEl.value.trim());
+    servicesEl.innerHTML=`<div class="empty">${q?`“${q}” bo‘yicha xizmat topilmadi.`:'Hech narsa topilmadi.'}</div>`;
+    countLineEl.textContent='';
+    return;
+  }
+
+  const typeTotal=services.filter(s=>selectedCats.has(s[3])).length;
+  countLineEl.textContent = rows.length===typeTotal ? `${rows.length} ta qurilma` : `${rows.length} / ${typeTotal} ta qurilma topildi`;
+
+  servicesEl.innerHTML = rows.map(s=>{
+    const [code,name,price]=s; const q0=getQty(code);
+    return `<div class="row${q0>0?' has-qty':''}" id="row_${code}" data-code="${code}">
+      <div class="code">#${code%1000}</div>
+      <div class="name">${esc(name)}${SHOWCAT?`<span class="rowcat">${esc(C[s[3]]||'')}</span>`:''}</div>
+      <div class="unitprice">${money(price)}</div>
+      <div class="stepper">
+        <button type="button" aria-label="Kamaytirish" data-act="dec" data-code="${code}" ${q0<=0?'disabled':''}>\u2212</button>
+        <input class="mono" type="number" inputmode="numeric" pattern="[0-9]*" min="0" step="1" value="${q0}" data-code="${code}" aria-label="${esc(name)} \u2014 miqdor">
+        <button type="button" aria-label="Ko\u2018paytirish" data-act="inc" data-code="${code}">+</button>
+      </div>
+      <div class="sum" id="sum_${code}">${money(q0*price)}</div>
+    </div>`;
+  }).join('');
+
+  servicesEl.querySelectorAll('.stepper button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const code=Number(btn.dataset.code);
+      const cur=getQty(code);
+      setQty(code, cur + (btn.dataset.act==='inc'?1:-1));
+      const input=servicesEl.querySelector(`input[data-code="${code}"]`);
+      if(input) input.value=getQty(code);
+      const decBtn=servicesEl.querySelector(`button[data-act="dec"][data-code="${code}"]`);
+      if(decBtn) decBtn.disabled = getQty(code)<=0;
+    });
+  });
+  servicesEl.querySelectorAll('.stepper input').forEach(inp=>{
+    // Update state live while typing, but don't rewrite the field's own value
+    // mid-keystroke (that would fight the user's cursor). Normalize on blur.
+    inp.addEventListener('input',()=>{
+      const code=Number(inp.dataset.code);
+      const n=Math.min(9999,Math.max(0, Math.floor(Number(inp.value)||0)));
+      qty_setSilently(code, n);
+    });
+    inp.addEventListener('blur',()=>{
+      const code=Number(inp.dataset.code);
+      inp.value=getQty(code);
+      if(typeof pushHistory==='function') pushHistory();
+    });
+  });
+}
+
+function qty_setSilently(code, n){
+  if(n===0) delete qty[code]; else qty[code]=n;
+  saveQty();
+  refreshRowVisual(code);
+  renderCart();
+}
+
+function refreshRowVisual(code){
+  const row=document.getElementById('row_'+code);
+  const sumEl=document.getElementById('sum_'+code);
+  if(row && sumEl && byCode[code]){
+    const price=byCode[code][2];
+    const n=getQty(code);
+    sumEl.textContent=money(n*price);
+    row.classList.toggle('has-qty', n>0);
+    const decBtn=row.querySelector('button[data-act="dec"]');
+    if(decBtn) decBtn.disabled = n<=0;
+  }
+  updateTotals();
+}
+
+const cartListEl=document.getElementById('cartList');
+const totalEl=document.getElementById('total');
+const stickyTotalEl=document.getElementById('stickyTotal');
+const stickyBarEl=document.getElementById('stickyBar');
+const cartCountLabelEl=document.getElementById('cartCountLabel');
+const stickyLabelEl=document.getElementById('stickyLabel');
+const copyBtn=document.getElementById('copyBtn');
+const printBtn=document.getElementById('printBtn');
+const clearBtn=document.getElementById('clearBtn');
+
+function cartEntries(){
+  return Object.keys(qty).map(Number)
+    .filter(code=>byCode[code] && getQty(code)>0)
+    .map(code=>({code, name:cartName(byCode[code]), price:byCode[code][2], n:getQty(code)}))
+    .sort((a,b)=>a.code-b.code);
+}
+
+function renderCart(){
+  const items=cartEntries();
+  const hasItems=items.length>0;
+
+  if(!hasItems){
+    cartListEl.innerHTML='<div class="empty">Hali hech qanday xizmat tanlanmagan. Yuqoridagi ro\u2018yxatdan miqdor kiriting.</div>';
+  } else {
+    cartListEl.innerHTML=items.map(it=>`
+      <div class="cart-item">
+        <div class="ci-name">${esc(it.name)}<span class="ci-code mono">#${it.code%1000} \u00b7 ${money(it.price)}/dona</span></div>
+        <div class="ci-qty mono">\u00d7${it.n}</div>
+        <div class="ci-sum">${money(it.n*it.price)}</div>
+        <button class="ci-remove no-print" data-code="${it.code}" aria-label="${esc(it.name)} olib tashlash" title="Olib tashlash">\u2715</button>
+      </div>`).join('');
+    cartListEl.querySelectorAll('.ci-remove').forEach(b=>{
+      b.addEventListener('click',()=>{
+        const code=Number(b.dataset.code);
+        setQty(code,0);
+        const input=servicesEl.querySelector(`input[data-code="${code}"]`);
+        if(input) input.value=0;
+        const decBtn=servicesEl.querySelector(`button[data-act="dec"][data-code="${code}"]`);
+        if(decBtn) decBtn.disabled=true;
+      });
+    });
+  }
+
+  const count=items.reduce((a,i)=>a+i.n,0);
+  cartCountLabelEl.textContent = count ? `Jami (${count} dona)` : 'Jami';
+  stickyLabelEl.textContent = count ? `Jami \u00b7 ${count} dona` : 'Jami';
+  stickyBarEl.style.display = hasItems ? 'flex' : 'none';
+  copyBtn.disabled = !hasItems;
+  printBtn.disabled = !hasItems;
+  clearBtn.disabled = !hasItems;
+  if(!hasItems && typeof disarmClear==='function') disarmClear();
+  updateTotals();
+}
+
+function updateTotals(){
+  const total=cartEntries().reduce((a,i)=>a+i.n*i.price,0);
+  totalEl.textContent=money(total);
+  stickyTotalEl.textContent=money(total);
+}
+
+const toastEl=document.getElementById('toast');
+let toastTimer=null;
+function showToast(msg){
+  toastEl.textContent=msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toastEl.classList.remove('show'),1800);
+}
+
+function summaryText(){
+  const items=cartEntries();
+  if(!items.length) return 'Tanlangan xizmatlar yo\u2018q.';
+  const lines=items.map(it=>`#${it.code%1000} ${it.name} \u2014 ${it.n} \u00d7 ${money(it.price)} = ${money(it.n*it.price)}`);
+  const total=items.reduce((a,i)=>a+i.n*i.price,0);
+  return lines.join('\n')+`\n\nJami: ${money(total)}`;
+}
+function copySummary(){
+  if(!cartEntries().length) return;
+  const text=summaryText();
+  const done=()=>showToast('Nusxa olindi');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  } else {
+    fallbackCopy(text,done);
+  }
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); cb(); }catch(e){ showToast('Nusxa olinmadi'); }
+  document.body.removeChild(ta);
+}
+
+function buildPrintSheet(){
+  const sheet=document.getElementById('printSheet'); const items=cartEntries();
+  const total=items.reduce((a,i)=>a+i.n*i.price,0), count=items.reduce((a,i)=>a+i.n,0);
+  const dt=fmtDate(new Date().toISOString());
+  const title=(document.querySelector('header .sub')||{}).textContent||'';
+  const rows=items.length?items.map((it,i)=>`<tr><td class="c">${i+1}</td><td class="c k">${it.code%1000}</td><td>${esc(it.name)}</td><td class="r">${money(it.price)}</td><td class="c">${it.n}</td><td class="r b">${money(it.n*it.price)}</td></tr>`).join(''):'<tr><td colspan="6" class="c">Tanlangan xizmatlar yo‘q</td></tr>';
+  sheet.innerHTML=`<div class="ps-head"><div><div class="ps-org">TSKO · Texnik servis ko‘rsatish ofisi</div><h1>Xizmat ko‘rsatish smetasi</h1><p>${esc(title)}</p></div><div class="ps-meta">Sana<strong>${dt}</strong>Xizmatlar<strong>${items.length} ta · ${count} dona</strong></div></div>
+  <table><thead><tr><th style="width:6%">№</th><th style="width:7%">Kod</th><th>Xizmat nomi</th><th style="width:15%">Narxi</th><th style="width:8%">Miqdor</th><th style="width:16%">Jami</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="5" class="r">JAMI:</td><td class="r">${money(total)}</td></tr></tfoot></table>
+  <p class="ps-note">Xizmatlar qiymatiga ehtiyot qismlar, materiallar va QQS kiritilmagan. Ular xizmat ko‘rsatish jarayonida alohida qo‘shiladi.</p>
+  <div class="ps-sign"><div><span>Ijrochi</span><i></i></div><div><span>Buyurtmachi</span><i></i></div></div>`;
+}
+let _title=document.title;
+window.addEventListener('beforeprint',()=>{buildPrintSheet();_title=document.title;document.title='TSKO smeta '+new Date().toISOString().slice(0,10)});
+window.addEventListener('afterprint',()=>{document.title=_title});
+function doPrint(){ if(cartEntries().length){buildPrintSheet();window.print();} }
+copyBtn.addEventListener('click', copySummary);
+document.getElementById('stickyCopy').addEventListener('click', copySummary);
+printBtn.addEventListener('click', doPrint);
+document.getElementById('stickyPrint').addEventListener('click', doPrint);
+const clearBtnDefaultText=clearBtn.textContent;
+let clearArmed=false, clearArmTimer=null;
+function disarmClear(){
+  clearArmed=false;
+  clearTimeout(clearArmTimer);
+  clearBtn.textContent=clearBtnDefaultText;
+  clearBtn.classList.remove('btn-armed');
+}
+clearBtn.addEventListener('click', ()=>{
+  if(!cartEntries().length) return;
+  if(!clearArmed){
+    clearArmed=true;
+    clearBtn.textContent='Ishonchingiz komilmi?';
+    clearBtn.classList.add('btn-armed');
+    // showToast('Tap twice');
+    clearTimeout(clearArmTimer);
+    clearArmTimer=setTimeout(disarmClear, 4000);
+    return;
+  }
+  disarmClear();
+  qty={}; saveQty();
+  renderServices(); renderCart();
+  if(typeof pushHistory==='function') pushHistory();
+  showToast('Barchasi tozalandi');
+});
+
+
+/* ===== RAPID WORKBENCH LOGIC ===== */
+const RAPID_KEY = (typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : 'tx_calc_qty_v3') + '_rapid';
+let historyStack=[], redoStack=[];
+function snapshot(){ return JSON.stringify(qty); }
+function pushHistory(){
+  const now=snapshot();
+  if(historyStack[historyStack.length-1]!==now) historyStack.push(now);
+  if(historyStack.length>25) historyStack.shift(); redoStack=[];
+  updateQuickButtons();
+}
+function restoreState(raw, toastMsg, fromHistory){
+  try{ const parsed=JSON.parse(raw)||{}; qty={}; Object.keys(parsed).forEach(k=>{if(!byCode[k])return; const n=Math.max(0,Math.min(9999,Number(parsed[k])||0)); if(n) qty[k]=n;}); saveQty(); renderServices(); renderCart(); showToast(toastMsg); if(!fromHistory) pushHistory(); updateQuickButtons(); }catch(e){showToast('Holatni tiklab bo‘lmadi')}
+}
+function undo(){
+  if(historyStack.length<2){showToast('Bekor qilinadigan amal yo‘q');return}
+  const current=historyStack.pop(); redoStack.push(current); restoreState(historyStack[historyStack.length-1],'Bekor qilindi',true);
+}
+function redo(){
+  if(!redoStack.length){showToast('Qaytariladigan amal yo‘q');return}
+  const next=redoStack.pop(); historyStack.push(next); restoreState(next,'Qaytarildi',true);
+}
+function updateQuickButtons(){
+  const u=document.getElementById('quickUndo'),r=document.getElementById('quickRedo');
+  if(u) u.disabled=historyStack.length<2; if(r) r.disabled=!redoStack.length;
+  const count=cartEntries().length; const status=document.getElementById('quickStatus');
+  if(status) status.innerHTML='<strong>'+count+' xizmat</strong> · <span class="kbd">/</span> qidiruv · <span class="kbd">Ctrl+S</span> saqlash · <span class="kbd">Esc</span> yopish';
+}
+let lastFocus=null;
+function openRapid(mode){
+  const m=document.getElementById('rapidModal'); lastFocus=document.activeElement;
+  renderJobs(); document.getElementById('saveHint').textContent=''; m.classList.add('show'); document.body.style.overflow='hidden';
+  setTimeout(()=>{ if(mode==='jobs'){ (m.querySelector('.job .qbtn')||document.getElementById('jobName')).focus(); } else document.getElementById('jobName').focus(); },30);
+}
+function closeRapid(){
+  const m=document.getElementById('rapidModal'); if(!m.classList.contains('show')) return;
+  m.classList.remove('show'); document.body.style.overflow=''; if(lastFocus&&lastFocus.focus) lastFocus.focus();
+}
+function jobs(){try{const a=JSON.parse(localStorage.getItem(RAPID_KEY)||'[]'); return Array.isArray(a)?a:[]}catch(e){return []}}
+function storeJobs(a){try{localStorage.setItem(RAPID_KEY,JSON.stringify(a.slice(0,20)));return true}catch(e){showToast('Saqlab bo‘lmadi');return false}}
+function jobStats(j){let c=0,t=0; for(const k of Object.keys(j.qty||{})){const s=byCode[k],n=Number(j.qty[k])||0; if(s&&n>0){c++;t+=n*s[2];}} return {c,t};}
+const p2=x=>String(x).padStart(2,'0');
+function fmtDate(iso){const d=new Date(iso); return isNaN(d)?'':`${p2(d.getDate())}.${p2(d.getMonth()+1)}.${d.getFullYear()} ${p2(d.getHours())}:${p2(d.getMinutes())}`}
+function renderJobs(){
+  const arr=jobs(), box=document.getElementById('jobsList'); document.getElementById('jobsCount').textContent=arr.length?'· '+arr.length+' ta':'';
+  if(!arr.length){box.innerHTML='<div class="jobs-empty">Hali saqlangan ish yo‘q. Yuqorida nom kiriting va «Saqlash» ni bosing.</div>';return}
+  box.innerHTML=arr.map((j,i)=>{const s=jobStats(j);return `<div class="job"><div class="j-main"><div class="j-name">${esc(j.name)}</div><div class="j-meta">${s.c} xizmat · ${money(s.t)} · ${esc(fmtDate(j.savedAt))}</div></div><button class="qbtn primary" data-open="${i}">Ochish</button><button class="qbtn" data-del="${i}" aria-label="O‘chirish">O‘chirish</button></div>`}).join('');
+}
+function saveJob(){
+  if(!cartEntries().length){document.getElementById('saveHint').textContent='Avval kamida bitta xizmat tanlang.';return}
+  const inp=document.getElementById('jobName'); const name=(inp.value||('Smeta · '+fmtDate(new Date().toISOString()))).trim();
+  const arr=jobs(); const had=arr.some(x=>x.name===name);
+  const next=arr.filter(x=>x.name!==name); next.unshift({name,qty:{...qty},savedAt:new Date().toISOString()});
+  if(!storeJobs(next)) return; inp.value=''; showToast(had?'Yangilandi: '+name:'Saqlandi: '+name); closeRapid();
+}
+function openJob(i){const j=jobs()[i]; if(!j){return} restoreState(JSON.stringify(j.qty||{}),'Ochildi: '+j.name); closeRapid();}
+function delJob(i){const a=jobs(); a.splice(i,1); storeJobs(a); renderJobs();}
+function downloadJSON(){
+  const payload={app:'TSKO Kalkulyator',version:1,savedAt:new Date().toISOString(),qty:{...qty}};
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'})); a.download='tsko-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); URL.revokeObjectURL(a.href); showToast('Backup tayyor');
+}
+function copyTSV(){
+  const rows=cartEntries(); if(!rows.length){showToast('Avval xizmat tanlang');return}
+  const out=[['Kod','Xizmat','Narx','Miqdor','Jami'],...rows.map(x=>[x.code%1000,x.name,x.price,x.n,x.n*x.price])].map(r=>r.join('\t')).join('\n');
+  navigator.clipboard?.writeText(out).then(()=>showToast('Jadval nusxalandi')).catch(()=>fallbackCopy(out,()=>showToast('Jadval nusxalandi')));
+}
+function applyBulk(n){
+  const val=Math.max(0,Math.min(9999,Number(n)||0)); const visible=Array.from(document.querySelectorAll('#services .row')).map(el=>el.dataset.code).filter(Boolean);
+  if(!visible.length){showToast('Ko‘rinadigan xizmat yo‘q');return} visible.forEach(code=>{if(val) qty[code]=val; else delete qty[code]}); saveQty(); renderServices(); renderCart(); if(typeof pushHistory==='function') pushHistory(); showToast(val?'Bulk miqdor qo‘llandi':'Ko‘rinayotganlar tozalandi');
+}
+const qSave=document.getElementById('quickSave'),qHistory=document.getElementById('quickHistory'),qUndo=document.getElementById('quickUndo'),qRedo=document.getElementById('quickRedo'),qBulk=document.getElementById('quickBulk'),qMore=document.getElementById('quickMore');
+qSave?.addEventListener('click',()=>openRapid('save'));
+qHistory?.addEventListener('click',()=>openRapid('jobs'));
+qUndo?.addEventListener('click',undo); qRedo?.addEventListener('click',redo);
+qBulk?.addEventListener('click',()=>document.getElementById('bulkRow').classList.toggle('show'));
+document.getElementById('applyBulk')?.addEventListener('click',()=>applyBulk(document.getElementById('bulkQty').value));
+document.getElementById('clearBulk')?.addEventListener('click',()=>applyBulk(0));
+document.getElementById('modalClose')?.addEventListener('click',closeRapid);
+document.getElementById('rapidModal')?.addEventListener('click',e=>{if(e.target.id==='rapidModal')closeRapid()});
+document.getElementById('modalSave')?.addEventListener('click',saveJob);
+document.getElementById('jobName')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveJob()}});
+document.getElementById('modalExport')?.addEventListener('click',downloadJSON);
+document.getElementById('modalCopyTable')?.addEventListener('click',copyTSV);
+document.getElementById('modalImport')?.addEventListener('click',()=>document.getElementById('importFile').click());
+let delArm=null,delTimer=null;
+document.getElementById('jobsList')?.addEventListener('click',e=>{
+  const o=e.target.closest('[data-open]'); if(o){openJob(Number(o.dataset.open));return}
+  const d=e.target.closest('[data-del]'); if(!d) return;
+  if(delArm===d){clearTimeout(delTimer);delArm=null;delJob(Number(d.dataset.del));return}
+  if(delArm){delArm.classList.remove('armed');delArm.textContent='O‘chirish'}
+  delArm=d; d.classList.add('armed'); d.textContent='Aniqmi?'; clearTimeout(delTimer); delTimer=setTimeout(()=>{d.classList.remove('armed');d.textContent='O‘chirish';delArm=null},3000);
+});
+document.getElementById('rapidModal')?.addEventListener('keydown',e=>{ // keep Tab inside the dialog
+  if(e.key!=='Tab') return; const f=[...e.currentTarget.querySelectorAll('button,input:not([hidden])')].filter(x=>!x.disabled&&x.offsetParent!==null); if(!f.length) return;
+  const a=f[0],z=f[f.length-1]; if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()} else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}
+});
+document.getElementById('importFile')?.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const p=JSON.parse(rd.result);restoreState(JSON.stringify(p.qty||p),'Zaxira tiklandi')}catch(err){showToast('JSON noto‘g‘ri')}};rd.readAsText(f);e.target.value=''});
+document.addEventListener('keydown',e=>{
+  const tag=(document.activeElement?.tagName||'').toLowerCase(); const typing=['input','textarea','select'].includes(tag);
+  if(e.key==='Escape'){closeRapid();return}
+  if(e.key==='/'&&!typing){e.preventDefault();document.getElementById('search')?.focus();return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();openRapid('save');return}
+  if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='c'){e.preventDefault();copySummary();return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!typing){e.preventDefault();e.shiftKey?redo():undo();return}
+});
+/* Track meaningful quantity changes without rewriting the existing calculator handlers. */
+const _renderCart=renderCart;
+renderCart=function(){ _renderCart(); updateQuickButtons(); };
+historyStack=[snapshot()]; updateQuickButtons();
+
+
+
+renderServices();
+renderCart();
+})();
+</script>
+<script>(()=>{"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+try{localStorage.setItem("tsko_last",(location.pathname.match(/Kalkulyator_(\d)/)||[])[1]||"")}catch(e){}
+const hd=$("header"); if(hd){const a=document.createElement("a");a.className="tk-back no-print";a.href="index.html";a.textContent="\u2039 Ilovalar";hd.prepend(a)}
+const list=$("#services"),meta=$(".search-meta"),cl=$("#cartList");
+if(list&&meta&&cl){
+ const bar=document.createElement("div");bar.className="tk-tools no-print";
+ bar.innerHTML='<button type="button" class="tk-tool" id="tkOnly" aria-pressed="false">Faqat tanlanganlar<b id="tkCnt">0</b></button>';
+ meta.after(bar);const b=$("#tkOnly");
+ b.onclick=()=>{const on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",on);list.classList.toggle("only-sel",on)};
+ const upd=()=>{$("#tkCnt").textContent=cl.querySelectorAll(".cart-item").length};
+ new MutationObserver(upd).observe(cl,{childList:true});upd();
+ list.addEventListener("focusin",e=>{if(e.target.matches(".stepper input"))setTimeout(()=>e.target.select(),0)});
+ list.addEventListener("keydown",e=>{if(e.key!=="Enter"||!e.target.matches(".stepper input"))return;e.preventDefault();
+  const all=$$("#services .stepper input").filter(i=>i.offsetParent),n=all[all.indexOf(e.target)+(e.shiftKey?-1:1)];
+  if(n){n.focus();n.closest(".row").scrollIntoView({block:"center",behavior:"smooth"})}else e.target.blur()});
+}
+const txt=()=>{const it=$$("#cartList .cart-item");if(!it.length)return"";
+ return "TSKO \u2014 xizmat smetasi\n\n"+it.map(el=>{const c=(el.querySelector(".ci-code")||{textContent:""}).textContent.split("\u00b7")[0].trim();
+ return c+" "+el.querySelector(".ci-name").firstChild.textContent.trim()+"\n   "+el.querySelector(".ci-qty").textContent.trim()+" = "+el.querySelector(".ci-sum").textContent.trim()}).join("\n")+"\n\nJami: "+$("#total").textContent};
+const ac=$(".sticky .s-actions");
+if(ac&&$("#cartCard")&&!matchMedia("(min-width:901px)").matches){const g=document.createElement("button");g.textContent="Ro\u2018yxat \u2193";
+ g.onclick=()=>$("#cartCard").scrollIntoView({behavior:"smooth"});ac.prepend(g)}
+})();</script>
+<script>(()=>{"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const items=()=>$$("#cartList .cart-item").map(el=>({c:(el.querySelector(".ci-code")||{textContent:""}).textContent.split("\u00b7")[0].trim(),n:el.querySelector(".ci-name").firstChild.textContent.trim(),q:el.querySelector(".ci-qty").textContent.replace(/\D/g,""),s:el.querySelector(".ci-sum").textContent.trim(),v:+el.querySelector(".ci-sum").textContent.replace(/\D/g,"")}));
+const total=()=>$("#total").textContent;
+const text=()=>{const a=items();return a.length?"TSKO \u2014 xizmat smetasi\n\n"+a.map(x=>x.c+" "+x.n+"\n   \u00d7"+x.q+" = "+x.s).join("\n")+"\n\nJami: "+total():""};
+const toast=m=>{const t=$("#toast");if(!t)return;t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),1800)};
+const dl=(name,blob)=>{const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)};
+const stamp=()=>new Date().toISOString().slice(0,10);
+function png(){return new Promise(res=>{const a=items(),W=900,pad=40,rh=46,H=180+a.length*rh+100,c=document.createElement("canvas"),k=2;c.width=W*k;c.height=H*k;const g=c.getContext("2d");g.scale(k,k);
+ const gr=g.createLinearGradient(0,0,W,H);gr.addColorStop(0,"#0F1B22");gr.addColorStop(1,"#15282F");g.fillStyle=gr;g.fillRect(0,0,W,H);
+ const ac=getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()||"#E8CB94",mo=getComputedStyle(document.documentElement).getPropertyValue("--money").trim()||"#93DAC5";
+ g.font="600 26px system-ui,Arial";g.fillStyle="#fff";g.fillText("TSKO \u2014 xizmat smetasi",pad,64);g.font="14px system-ui,Arial";g.fillStyle="#93A0B2";g.fillText(new Date().toLocaleDateString("uz-UZ"),pad,90);
+ let y=130;a.forEach((x,i)=>{g.fillStyle="rgba(255,255,255,.05)";g.fillRect(pad,y-24,W-2*pad,rh-6);g.font="14px system-ui,Arial";g.fillStyle="#EDF1F7";let n=x.n;while(g.measureText(n).width>470&&n.length>4)n=n.slice(0,-2);if(n!==x.n)n+="\u2026";g.fillText(n,pad+12,y);g.fillStyle="#93A0B2";g.textAlign="right";g.fillText("\u00d7"+x.q,W-pad-190,y);g.fillStyle="#fff";g.fillText(x.s,W-pad-12,y);g.textAlign="left";y+=rh});
+ g.fillStyle=ac;g.fillRect(pad,y-6,W-2*pad,2);g.font="600 15px system-ui,Arial";g.fillStyle="#93A0B2";g.fillText("Jami",pad,y+34);g.font="700 30px system-ui,Arial";g.fillStyle=mo;g.textAlign="right";g.fillText(total(),W-pad,y+38);
+ c.toBlob(res,"image/png")})}
+const act={
+ tg:()=>window.open("https://t.me/share/url?url="+encodeURIComponent(" ")+"&text="+encodeURIComponent(text()),"_blank","noopener"),
+ wa:()=>window.open("https://wa.me/?text="+encodeURIComponent(text()),"_blank","noopener"),
+ sms:()=>{location.href="sms:?&body="+encodeURIComponent(text())},
+ mail:()=>{location.href="mailto:?subject="+encodeURIComponent("TSKO smeta "+stamp())+"&body="+encodeURIComponent(text())},
+ txt:()=>{dl("TSKO_smeta_"+stamp()+".txt",new Blob([text()],{type:"text/plain;charset=utf-8"}));toast("TXT yuklandi")},
+ csv:()=>{const q=v=>'"'+String(v).replace(/"/g,'""')+'"';const r=[["Kod","Xizmat","Miqdor","Jami (so\u2018m)"],...items().map(x=>[x.c,x.n,x.q,x.v]),["","Jami","",+total().replace(/\D/g,"")]];dl("TSKO_smeta_"+stamp()+".csv",new Blob(["\ufeff"+r.map(l=>l.map(q).join(";")).join("\r\n")],{type:"text/csv;charset=utf-8"}));toast("Excel fayl yuklandi")},
+ img:async()=>{const b=await png(),f=new File([b],"TSKO_smeta_"+stamp()+".png",{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:"TSKO smeta"});return}catch(e){if(e.name==="AbortError")return}}dl(f.name,b);toast("Rasm yuklandi")},
+ copy:()=>$("#copyBtn").click(),print:()=>$("#printBtn").click(),
+ native:()=>navigator.share({title:"TSKO smeta",text:text()}).catch(()=>{})};
+const O=[["tg","Telegram","T","#5AB8F0","main"],["wa","WhatsApp","W","#6FD69A"],["img","Rasm (PNG)","\u25A3","#E8CB94"],["csv","Excel (CSV)","X","#7FCB9A"],["txt","Matn (TXT)","Aa","#B9C2D1"],["sms","SMS","\u2709","#9DB8F5"],["mail","Email","@","#C9A9F0"],["copy","Nusxa","\u29C9","#B9C2D1"],["print","Chop / PDF","\u2399","#B9C2D1"]];
+if(navigator.share)O.push(["native","Boshqa\u2026","\u22EF","#B9C2D1"]);
+const mkBg=h=>{const d=document.createElement("div");d.className="tk-bg no-print";d.innerHTML=h;document.body.append(d);d.addEventListener("click",e=>{if(e.target===d||e.target.closest("[data-x]"))d.classList.remove("show")});return d};
+const share=mkBg('<div class="tk-sheet" role="dialog" aria-modal="true" aria-label="Ulashish"><h3>Smetani ulashish</h3><p id="tkSum"></p><div class="tk-grid">'+O.map(o=>`<button type="button" class="tk-opt${o[4]?" main":""}" data-a="${o[0]}" style="--c:${o[3]}"><i>${o[2]}</i>${o[1]}</button>`).join("")+'</div><button class="tk-close" data-x>Yopish</button></div>');
+share.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;share.classList.remove("show");act[b.dataset.a]()});
+const openShare=()=>{const a=items();if(!a.length){toast("Avval xizmat tanlang");return}$("#tkSum").textContent=a.length+" xizmat \u00b7 "+total();share.classList.add("show");share.querySelector(".tk-opt").focus()};
+const K=[["/  yoki  Ctrl+K","Qidiruv"],["\u2193 / \u2191","Qidiruvdan qatorlarga; qatorlar orasida"],["Enter / Shift+Enter","Keyingi / oldingi qator"],["+  /  \u2212","Miqdorni oshirish / kamaytirish"],["Delete","Qator miqdorini 0 qilish"],["F","Faqat tanlanganlar"],["G","Tanlangan xizmatlar ro\u2018yxatiga o\u2018tish"],["Ctrl+Shift+T","Ulashish oynasi"],["Ctrl+Shift+C","Nusxa olish"],["Ctrl+S","Smetani saqlash"],["Ctrl+Z / Ctrl+Shift+Z","Bekor qilish / qaytarish"],["Alt+1\u20134","Ilovalar orasida o\u2018tish"],["Esc","Yopish / qidiruvni tozalash"]];
+const help=mkBg('<div class="tk-sheet" role="dialog" aria-modal="true" aria-label="Klavish"><h3>Klavish yorliqlari</h3><p>Sichqonchasiz tez ishlash uchun</p><div class="tk-keys">'+K.map(k=>`<kbd>${k[0]}</kbd><span>${k[1]}</span>`).join("")+'</div><button class="tk-close" data-x>Yopish</button></div>');
+/* share button in cart + sticky bar + quickbar help */
+const row=$("#cartCard .btnrow");
+if(row){const b=document.createElement("button");b.className="btn";b.id="tkShareBtn";b.textContent="Ulashish";b.onclick=openShare;row.prepend(b);
+ const sy=()=>{b.disabled=!$("#cartList .cart-item")};new MutationObserver(sy).observe($("#cartList"),{childList:true});sy()}
+const ac=$(".sticky .s-actions");if(ac){const b=document.createElement("button");b.textContent="Ulashish";b.onclick=openShare;ac.append(b)}
+const qb=$(".quickbar");if(qb){const b=document.createElement("button");b.className="qbtn tk-kbdbtn";b.textContent="\u2328 Klavish";b.onclick=()=>help.classList.add("show");const st=qb.querySelector(".quick-status");st?qb.insertBefore(b,st):qb.append(b)}
+/* voice search */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition,sw=$(".search-wrap"),se=$("#search");
+if(SR&&sw&&se){const m=document.createElement("button");m.type="button";m.className="tk-mic";m.textContent="\uD83C\uDFA4";m.setAttribute("aria-label","Ovoz bilan qidirish");sw.append(m);let r=null;
+ m.onclick=()=>{if(r){r.stop();return}r=new SR();r.lang="uz-UZ";r.interimResults=false;m.classList.add("on");
+  r.onresult=e=>{se.value=e.results[0][0].transcript;se.dispatchEvent(new Event("input",{bubbles:true}))};
+  r.onerror=()=>toast("Ovoz tanilmadi");r.onend=()=>{r=null;m.classList.remove("on")};try{r.start()}catch(e){r=null;m.classList.remove("on")}}}
+/* scroll-to-top + haptics */
+const f=document.createElement("button");f.className="tk-fab no-print";f.textContent="\u2191";f.setAttribute("aria-label","Yuqoriga");f.onclick=()=>scrollTo({top:0,behavior:"smooth"});document.body.append(f);
+addEventListener("scroll",()=>f.classList.toggle("show",scrollY>600),{passive:true});
+document.addEventListener("click",e=>{if(e.target.closest(".stepper button,.ci-remove"))navigator.vibrate&&navigator.vibrate(6)});
+/* keyboard */
+const rows=()=>$$("#services .stepper input").filter(i=>i.offsetParent);
+const go=(i,d)=>{const a=rows(),n=a[a.indexOf(i)+d];if(n){n.focus();n.closest(".row").scrollIntoView({block:"center",behavior:"smooth"})}};
+document.addEventListener("keydown",e=>{
+ const t=e.target,typing=t.matches&&t.matches("input,textarea,select"),mod=e.ctrlKey||e.metaKey,k=e.key.toLowerCase();
+ if(e.key==="Escape"){share.classList.remove("show");help.classList.remove("show");return}
+ if(mod&&k==="k"){e.preventDefault();se&&(se.focus(),se.select());return}
+ if(mod&&e.shiftKey&&k==="t"){e.preventDefault();openShare();return}
+ if(e.altKey&&!mod&&/^[1-4]$/.test(e.key)){e.preventDefault();location.href="Calc_"+e.key+".html";return}
+ if(t.matches&&t.matches(".stepper input")&&!mod&&!e.altKey){
+  const row=t.closest(".row");
+  if(e.key==="ArrowDown"){e.preventDefault();go(t,1)}else if(e.key==="ArrowUp"){e.preventDefault();go(t,-1)}
+  else if(e.key==="+"||e.key==="="){e.preventDefault();row.querySelector('[data-act="inc"]').click();t.focus()}
+  else if(e.key==="-"||e.key==="\u2212"){e.preventDefault();row.querySelector('[data-act="dec"]').click();t.focus()}
+  else if(e.key==="Delete"){e.preventDefault();t.value=0;t.dispatchEvent(new Event("input",{bubbles:true}));t.select()}
+  return}
+ if(t===se&&e.key==="ArrowDown"){e.preventDefault();const a=rows()[0];a&&a.focus();return}
+ if(!typing&&!mod&&!e.altKey){
+  if(e.key==="?"){help.classList.add("show");return}
+  if(k==="f"){const b=$("#tkOnly");b&&b.click();return}
+  if(k==="g"){const c=$("#cartCard");c&&c.scrollIntoView({behavior:"smooth"});return}}
+});
+})();</script>
+</body>
+</html>
